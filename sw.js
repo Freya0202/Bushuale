@@ -1,5 +1,5 @@
 // Offline cache: the app opens even without network. Bump VERSION after editing index.html.
-const VERSION = 'bushuale-v5';
+const VERSION = 'bushuale-v6';
 const FILES = ['./', './index.html', './qrcode.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(VERSION).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));

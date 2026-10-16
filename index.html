@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>不刷了</title>
 <meta name="description" content="不刷了：戒掉刷短视频。每天一键打卡，自己定周期、奖励和惩罚。数据只存在你自己的手机上。">
-<meta name="theme-color" content="#F3F6F1" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0E1719" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F2F3EF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121614" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -15,25 +15,21 @@
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Noto+Sans+SC:wght@400;500;700;900&display=swap">
 <style>
 /* Layout: one narrow phone column — streak hero + challenge bar, big check button, owed penalties, this week, reward ladder, 5-week grid; settings as a full-screen sheet */
 :root{
-  --bg:#F3F6F1; --surface:#FFFFFF; --ink:#1C2B27; --muted:#667873; --line:#DFE7E1;
-  --moss:#2F8559; --moss-2:#4AA772; --moss-soft:#E2F2E7; --heather:#D9792C; --heather-soft:#FDF0E2;
-  --slip:#C4553F; --slip-soft:#FAE3DC; --onaccent:#FFFFFF;
-  --sky-top:#BFE0F2; --sky-mid:#E6F1EE; --sky-bot:#FCEBD4; --hill-far:#A9D3AC; --hill-near:#6DB385; --sun-core:#FFF6D6; --sun-glow:#FFC56E;
-  --shadow:0 1px 2px rgba(28,43,39,.05),0 8px 24px rgba(28,43,39,.07);
-  --f-num:"Nunito","Avenir Next","Segoe UI",Roboto,"PingFang SC",system-ui,sans-serif;
-  --f-body:"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+  --bg:#F2F3EF; --surface:#FFFFFF; --ink:#1E2421; --muted:#68716B; --line:#DCE0DA;
+  --moss:#2F6B4F; --moss-soft:#DCEBE2; --heather:#7B4E8C; --heather-soft:#EEE4F2;
+  --slip:#B5483B; --slip-soft:#F6E1DD; --onaccent:#FFFFFF;
+  --f-num:"Bricolage Grotesque","Noto Sans SC",system-ui,sans-serif;
+  --f-body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){:root{
-  --bg:#0E1719; --surface:#162225; --ink:#E5EFEA; --muted:#92A59F; --line:#24343A;
-  --moss:#5CC48A; --moss-2:#3E9E68; --moss-soft:#183126; --heather:#F2AE62; --heather-soft:#3A2A19;
-  --slip:#EE8A74; --slip-soft:#3A221D; --onaccent:#0C1612;
-  --sky-top:#13253C; --sky-mid:#273450; --sky-bot:#5B4757; --hill-far:#1F3B33; --hill-near:#142A23; --sun-core:#FFE7B8; --sun-glow:#F09A5A;
-  --shadow:0 1px 0 rgba(0,0,0,.25); color-scheme:dark }}
+  --bg:#121614; --surface:#1B201D; --ink:#E9EEEA; --muted:#97A29B; --line:#2C3430;
+  --moss:#6CC197; --moss-soft:#1F3329; --heather:#C59BD6; --heather-soft:#2E2433;
+  --slip:#E7887B; --slip-soft:#3A2220; --onaccent:#0E1411; color-scheme:dark }}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;-webkit-tap-highlight-color:transparent}
@@ -42,36 +38,27 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);fo
 h1,h2,h3{margin:0}
 .top{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .top h1{font-size:15px;font-weight:700;letter-spacing:.04em}
-.brand{display:flex;align-items:center;gap:10px;min-width:0}
-.brand svg{width:36px;height:36px;flex:none}
-.brand h1{font-size:20px;font-weight:900;letter-spacing:.08em;line-height:1.1}
-.brand span{display:block;font-size:12px;color:var(--muted);letter-spacing:.06em}
 .top .r{display:flex;align-items:center;gap:10px}
 .top .date{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
-.gear{appearance:none;border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow);border-radius:999px;width:36px;height:36px;display:grid;place-items:center;cursor:pointer;color:var(--muted)}
+.gear{appearance:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;width:36px;height:36px;display:grid;place-items:center;cursor:pointer;color:var(--muted)}
 .gear svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
-.hero{position:relative;border-radius:28px;overflow:hidden;background:linear-gradient(180deg,var(--sky-top) 0%,var(--sky-mid) 55%,var(--sky-bot) 100%);box-shadow:var(--shadow);min-height:252px;isolation:isolate}
-.sun{position:absolute;right:14%;width:88px;height:88px;border-radius:50%;top:calc(58% - var(--sun,0) * 46%);background:radial-gradient(circle,var(--sun-core) 0 34%,var(--sun-glow) 36% 46%,color-mix(in srgb,var(--sun-glow) 30%,transparent) 58%,transparent 72%);transition:top 1.2s ease;z-index:0}
-.hills{position:absolute;left:0;right:0;bottom:0;width:100%;height:96px;z-index:1}
-.hills .far{fill:var(--hill-far)}.hills .near{fill:var(--hill-near)}
-.hero-in{position:relative;z-index:2;padding:22px 20px 18px;display:flex;flex-direction:column;gap:14px;min-height:252px}
-.hero .row1{display:flex;align-items:flex-end;gap:12px}
-.big{font-family:var(--f-num);font-weight:900;font-size:104px;line-height:.82;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--ink)}
-.hero .lbl{padding-bottom:8px;min-width:0}
+.hero{display:flex;flex-direction:column;gap:12px}
+.hero .row1{display:flex;align-items:flex-end;gap:14px}
+.big{font-family:var(--f-num);font-weight:800;font-size:96px;line-height:.85;letter-spacing:-.04em;font-variant-numeric:tabular-nums;color:var(--moss)}
+.hero .lbl{padding-bottom:6px;min-width:0}
 .hero .lbl b{display:block;font-size:18px}
 .hero .lbl span{color:var(--muted);font-size:13px}
-.goal{margin-top:auto;display:flex;flex-direction:column;gap:6px;background:color-mix(in srgb,var(--surface) 82%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:16px;padding:10px 12px}
+.goal{display:flex;flex-direction:column;gap:5px}
 .goal .t{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
-.goal .t span:last-child{font-family:var(--f-num);font-weight:800;color:var(--ink)}
-.goal .track{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
-.goal .track i{display:block;height:100%;background:linear-gradient(90deg,var(--moss-2),var(--moss));border-radius:99px;transition:width .6s}
+.goal .track{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.goal .track i{display:block;height:100%;background:var(--moss);border-radius:99px;transition:width .5s}
 
-.check{appearance:none;border:0;width:100%;border-radius:24px;padding:22px 18px;font:inherit;font-size:20px;font-weight:900;letter-spacing:.06em;background:linear-gradient(180deg,var(--moss-2),var(--moss));box-shadow:0 10px 24px color-mix(in srgb,var(--moss) 30%,transparent);color:var(--onaccent);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .12s}
+.check{appearance:none;border:0;width:100%;border-radius:22px;padding:22px 18px;font:inherit;font-size:20px;font-weight:900;letter-spacing:.06em;background:var(--moss);color:var(--onaccent);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .12s}
 .check small{font-size:13px;font-weight:500;letter-spacing:0;opacity:.85}
 .check:active{transform:scale(.98)}
-.check.done{background:var(--moss-soft);color:var(--moss);box-shadow:none}
-.check.slipped{background:var(--slip-soft);color:var(--slip);box-shadow:none}
+.check.done{background:var(--moss-soft);color:var(--moss)}
+.check.slipped{background:var(--slip-soft);color:var(--slip)}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--heather);outline-offset:2px}
 .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 .row.l{justify-content:flex-start}
@@ -82,12 +69,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .btn.on{background:var(--moss);color:var(--onaccent);border-color:var(--moss)}
 .btn.sm{padding:5px 11px;font-size:12px}
 
-.sec h2{font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--ink);margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.sec h2::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--heather)}
+.sec h2{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--muted);margin-bottom:10px}
 .week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
 .wd{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
-.dot{width:100%;max-width:40px;aspect-ratio:1;border-radius:50%;border:2px dashed var(--line);display:grid;place-items:center;font-family:var(--f-num);font-weight:800;font-size:14px;color:var(--muted)}
-.dot.ok{background:linear-gradient(180deg,var(--moss-2),var(--moss));border:2px solid var(--moss);color:var(--onaccent)}
+.dot{width:100%;max-width:40px;aspect-ratio:1;border-radius:50%;border:2px dashed var(--line);display:grid;place-items:center;font-family:var(--f-num);font-weight:600;font-size:14px;color:var(--muted)}
+.dot.ok{background:var(--moss);border:2px solid var(--moss);color:var(--onaccent)}
 .dot.bad{background:var(--slip-soft);border:2px solid var(--slip);color:var(--slip)}
 .dot.today{border-style:solid;border-color:var(--ink);color:var(--ink)}
 .dot.ok.today{border-color:var(--moss);color:var(--onaccent)}
@@ -101,14 +87,14 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .debt .btn{border-color:var(--slip);color:var(--slip);background:var(--surface);white-space:nowrap}
 
 .ladder{display:flex;flex-direction:column;gap:10px}
-.rung{background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:20px;padding:14px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:4px 14px;align-items:center}
+.rung{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:4px 14px;align-items:center}
 .rung .ic{grid-row:span 2;width:44px;height:44px;border-radius:12px;background:var(--heather-soft);display:grid;place-items:center}
 .rung .ic svg{width:26px;height:26px;stroke:var(--heather);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .rung .name{font-weight:700;font-size:16px;min-width:0;overflow-wrap:anywhere}
 .rung .name em{font-style:normal;font-weight:500;color:var(--muted);font-size:13px;margin-left:6px;white-space:nowrap}
-.rung .count{font-family:var(--f-num);font-weight:800;font-variant-numeric:tabular-nums;font-size:14px;color:var(--muted);white-space:nowrap}
+.rung .count{font-family:var(--f-num);font-weight:600;font-variant-numeric:tabular-nums;font-size:14px;color:var(--muted);white-space:nowrap}
 .bar{grid-column:2/4;height:8px;border-radius:99px;background:var(--line);overflow:hidden}
-.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--sun-glow),var(--heather));border-radius:99px;transition:width .5s}
+.bar i{display:block;height:100%;background:var(--heather);border-radius:99px;transition:width .5s}
 .rung.won{border-color:var(--heather);background:var(--heather-soft)}
 .rung.won .ic{background:var(--heather)}
 .rung.won .ic svg{stroke:var(--onaccent)}
@@ -118,7 +104,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 
 .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
 .gh{font-size:11px;color:var(--muted);text-align:center}
-.cell{aspect-ratio:1;border-radius:8px;background:var(--line);opacity:.55}
+.cell{aspect-ratio:1;border-radius:6px;background:var(--line);opacity:.55}
 .cell.ok{background:var(--moss);opacity:1}
 .cell.bad{background:var(--slip);opacity:1}
 .cell.future{background:transparent;border:1px dashed var(--line);opacity:1}
@@ -128,14 +114,14 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
 
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.stat{background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:18px;padding:10px}
-.stat b{display:block;font-family:var(--f-num);font-size:24px;font-weight:900;font-variant-numeric:tabular-nums}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px}
+.stat b{display:block;font-family:var(--f-num);font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
 .stat span{font-size:11px;color:var(--muted)}
 @media (max-width:340px){.stats{grid-template-columns:repeat(2,1fr)}}
 
 /* quick tools under the check button */
 .tools{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.tool{appearance:none;font:inherit;text-align:left;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:20px;padding:12px 14px;cursor:pointer;display:flex;gap:10px;align-items:center;color:var(--ink)}
+.tool{appearance:none;font:inherit;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px;cursor:pointer;display:flex;gap:10px;align-items:center;color:var(--ink)}
 .tool svg{width:26px;height:26px;flex:none;stroke:var(--heather);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .tool b{display:block;font-size:15px}
 .tool span{display:block;font-size:12px;color:var(--muted)}
@@ -196,7 +182,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .alarm button{appearance:none;border:0;background:var(--onaccent);color:var(--heather);font:inherit;font-weight:700;border-radius:999px;padding:8px 14px;cursor:pointer;white-space:nowrap}
 .alarm.ring{animation:ring 1s ease-in-out 3}
 @keyframes ring{0%,100%{transform:none}20%{transform:rotate(-1.5deg)}40%{transform:rotate(1.5deg)}60%{transform:rotate(-1deg)}80%{transform:rotate(1deg)}}
-.remind{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:18px;padding:12px 14px}
+.remind{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
 .remind b{display:block;font-size:15px}
 .remind span{font-size:12px;color:var(--muted)}
 
@@ -232,20 +218,16 @@ label.ck input{width:18px;height:18px;accent-color:var(--moss)}
 </head>
 <body>
 <div class="wrap" id="main">
-  <div class="top"><div class="brand"><svg viewBox="0 0 36 36" aria-hidden="true"><rect width="36" height="36" rx="11" fill="var(--sky-top)"/><circle cx="23" cy="15" r="6" fill="var(--sun-glow)"/><path d="M0 26c6-5 12-6 18-3s12 2 18-2v15H0z" fill="var(--hill-near)"/></svg><div><h1>不刷了</h1><span id="today"></span></div></div><div class="r">
+  <div class="top"><h1>不刷了 · 每日打卡</h1><div class="r"><span class="date" id="today"></span>
     <button class="gear" id="openShare" type="button" aria-label="分享给朋友"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button>
     <button class="gear" id="openSet" type="button" aria-label="设置"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></div></div>
 
   <div class="hint" id="installHint" hidden><div><b>先装到主屏幕</b><span id="installTxt"></span></div><button class="x" type="button" id="hintX" aria-label="关闭">×</button></div>
 
   <div class="hero" id="hero">
-    <div class="sun" aria-hidden="true"></div>
-    <svg class="hills" viewBox="0 0 400 96" preserveAspectRatio="none" aria-hidden="true"><path class="far" d="M0 44C70 18 140 22 210 42S330 52 400 26V96H0Z"/><path class="near" d="M0 74C60 56 130 58 200 72S330 84 400 64V96H0Z"/></svg>
-    <div class="hero-in">
-      <div class="row1"><div class="big" id="streak">0</div>
-        <div class="lbl"><b>天没刷短视频</b><span id="next">打第一次卡，开始计数</span></div></div>
-      <div class="goal"><div class="t"><span id="goalLbl">挑战 365 天</span><span id="goalNum">0 / 365</span></div><div class="track"><i id="goalBar" style="width:0"></i></div></div>
-    </div>
+    <div class="row1"><div class="big" id="streak">0</div>
+      <div class="lbl"><b>天连续不刷</b><span id="next">打第一次卡，开始计数</span></div></div>
+    <div class="goal"><div class="t"><span id="goalLbl">挑战 365 天</span><span id="goalNum">0 / 365</span></div><div class="track"><i id="goalBar" style="width:0"></i></div></div>
   </div>
 
   <div class="alarm" id="alarm" role="alert" hidden><div><b id="alarmTitle">23:00 了，今天还没打卡</b><span>没刷短视频就点右边，刷了也如实记一下</span></div><button type="button" id="alarmBtn">去打卡</button></div>
@@ -434,7 +416,7 @@ label.ck input{width:18px;height:18px;accent-color:var(--moss)}
 
   function render(){
     const t=todayD(),tk=ds(t),yk=ds(addDays(t,-1));
-    $('today').textContent=`${t.getMonth()+1}月${t.getDate()}日 · 周${WD[t.getDay()]}`;
+    $('today').textContent=`${t.getMonth()+1}月${t.getDate()}日 周${WD[t.getDay()]}`;
     if(issueMissed())save();
     const st=streakInfo();
     $('streak').textContent=st.cur;
@@ -677,47 +659,36 @@ label.ck input{width:18px;height:18px;accent-color:var(--moss)}
   $('openShare').onclick=openShare;
 
   // ---- check-in share image ----
-  const FONT='"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif';
+  const FONT='"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif';
   function fit(g,text,maxW){if(g.measureText(text).width<=maxW)return text;let t=text;while(t.length>1&&g.measureText(t+'…').width>maxW)t=t.slice(0,-1);return t+'…'}
   function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
   function drawCard(showRewards){
     const W=1080,H=1440,cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');
-    const st=streakInfo(),t=todayD(),moss='#2F8559',moss2='#4AA772',amber='#D9792C',ink='#1C2B27',muted='#667873',line='#DFE7E1';
-    const NUM=`"Nunito","Avenir Next",${FONT}`;
-    g.fillStyle='#F3F6F1';g.fillRect(0,0,W,H);
-    // dawn sky with sun rising by progress, hills
-    const skyH=640,sky=g.createLinearGradient(0,0,0,skyH);sky.addColorStop(0,'#BFE0F2');sky.addColorStop(.55,'#E6F1EE');sky.addColorStop(1,'#FCEBD4');
-    g.fillStyle=sky;g.fillRect(0,0,W,skyH);
-    const prog=Math.min(1,st.cur/S.period),sx=W*0.78,sy=skyH*0.62-prog*skyH*0.44;
-    const sun=g.createRadialGradient(sx,sy,0,sx,sy,170);sun.addColorStop(0,'#FFF6D6');sun.addColorStop(.3,'#FFF6D6');sun.addColorStop(.33,'#FFC56E');sun.addColorStop(.45,'rgba(255,197,110,.9)');sun.addColorStop(.6,'rgba(255,197,110,.3)');sun.addColorStop(1,'rgba(255,197,110,0)');
-    g.fillStyle=sun;g.fillRect(sx-180,sy-180,360,360);
-    g.fillStyle='#A9D3AC';g.beginPath();g.moveTo(0,skyH-170);g.bezierCurveTo(200,skyH-240,380,skyH-230,560,skyH-180);g.bezierCurveTo(740,skyH-130,900,skyH-160,W,skyH-230);g.lineTo(W,skyH);g.lineTo(0,skyH);g.fill();
-    g.fillStyle='#6DB385';g.beginPath();g.moveTo(0,skyH-80);g.bezierCurveTo(160,skyH-130,340,skyH-125,540,skyH-90);g.bezierCurveTo(740,skyH-55,880,skyH-70,W,skyH-110);g.lineTo(W,skyH);g.lineTo(0,skyH);g.fill();
-    // brand
-    rr(g,72,64,72,72,22);g.fillStyle='#FFFFFF';g.fill();g.fillStyle='#FFC56E';g.beginPath();g.arc(118,96,14,0,7);g.fill();g.fillStyle='#6DB385';g.beginPath();g.moveTo(72,118);g.bezierCurveTo(90,104,110,104,126,112);g.bezierCurveTo(134,116,140,114,144,110);g.lineTo(144,114);g.arcTo(144,136,122,136,22);g.lineTo(94,136);g.arcTo(72,136,72,114,22);g.closePath();g.fill();
-    g.textBaseline='alphabetic';g.fillStyle=ink;g.font=`900 52px ${FONT}`;g.fillText('不刷了',164,116);
-    g.font=`500 32px ${FONT}`;g.fillStyle=muted;g.textAlign='right';g.fillText(`${t.getFullYear()}.${pad(t.getMonth()+1)}.${pad(t.getDate())}`,W-80,112);g.textAlign='left';
-    g.fillStyle=ink;g.font=`900 300px ${NUM}`;const num=String(st.cur);g.fillText(num,64,440);
-    const nw=g.measureText(num).width;g.font=`800 64px ${FONT}`;g.fillText('天',64+nw+24,350);
-    g.font=`600 44px ${FONT}`;g.fillText('没刷短视频',64+nw+24,422);
-    // challenge bar
-    let y=skyH+80;g.fillStyle=muted;g.font=`500 34px ${FONT}`;g.fillText(`挑战周期 ${S.period} 天`,80,y);g.textAlign='right';g.fillStyle=ink;g.font=`800 36px ${NUM}`;g.fillText(`${Math.min(st.cur,S.period)} / ${S.period}`,W-80,y);g.textAlign='left';
-    rr(g,80,y+22,W-160,22,11);g.fillStyle=line;g.fill();if(prog>0){rr(g,80,y+22,Math.max(22,(W-160)*prog),22,11);const gr=g.createLinearGradient(80,0,W-80,0);gr.addColorStop(0,moss2);gr.addColorStop(1,moss);g.fillStyle=gr;g.fill()}
-    // rewards
-    y+=96;const list=S.rewards.slice().sort((a,b)=>a.days-b.days).slice(0,3);
-    if(!list.length){g.fillStyle=muted;g.font=`400 34px ${FONT}`;g.fillText('还没设置奖励',80,y+40);}
-    list.forEach((r,i)=>{const pr=r.repeat?st.cur%r.days:Math.min(st.cur,r.days),won=r.repeat?(st.cur>0&&st.cur%r.days===0):!!S.unlocked[r.id];
-      rr(g,80,y,W-160,104,26);g.fillStyle=won?'#FDF0E2':'#FFFFFF';g.fill();g.lineWidth=2;g.strokeStyle=won?amber:line;g.stroke();
-      g.fillStyle=ink;g.font=`700 38px ${FONT}`;g.fillText(fit(g,showRewards?r.name:`奖励 ${i+1}`,560),114,y+50);
-      g.fillStyle=won?amber:muted;g.font=`800 32px ${NUM}`;g.textAlign='right';g.fillText(won?'已解锁 ✓':`${pr} / ${r.days}${r.repeat?' · 循环':''}`,W-114,y+52);g.textAlign='left';
-      rr(g,114,y+72,W-228,12,6);g.fillStyle=line;g.fill();const q=won?1:pr/r.days;if(q>0){rr(g,114,y+72,Math.max(12,(W-228)*q),12,6);const gr=g.createLinearGradient(114,0,W-114,0);gr.addColorStop(0,'#FFC56E');gr.addColorStop(1,amber);g.fillStyle=gr;g.fill()}
-      y+=122});
-    // footer with QR
-    const fy=H-228;g.fillStyle='#FFFFFF';rr(g,60,fy,W-120,196,30);g.fill();
-    const qc=document.createElement('canvas');if(isHttp&&drawQR(qc,APP_URL,170))g.drawImage(qc,86,fy+15,170,170);
-    const tx=isHttp?290:100;g.fillStyle=ink;g.font=`800 42px ${FONT}`;g.fillText(isHttp?'扫码，一起不刷了':'一起不刷了',tx,fy+80);
-    g.fillStyle=muted;g.font=`400 30px ${FONT}`;g.fillText('自己定奖励和惩罚 · 不用注册',tx,fy+128);
-    g.font=`400 24px ${FONT}`;g.fillText(fit(g,APP_URL.replace(/^https?:\/\//,''),W-tx-100),tx,fy+170);
+    const st=streakInfo(),t=todayD(),moss='#2F6B4F',heather='#7B4E8C',ink='#1E2421',muted='#68716B',line='#DCE0DA';
+    const NUM=`"Bricolage Grotesque",${FONT}`;
+    g.fillStyle='#F2F3EF';g.fillRect(0,0,W,H);
+    g.fillStyle=moss;g.fillRect(0,0,W,150);
+    g.fillStyle='#FFFFFF';g.font=`700 52px ${FONT}`;g.textBaseline='middle';g.fillText('不刷了 · 每日打卡',80,78);
+    g.font=`400 34px ${FONT}`;g.textAlign='right';g.fillText(`${t.getFullYear()}.${pad(t.getMonth()+1)}.${pad(t.getDate())}`,W-80,80);g.textAlign='left';
+    g.textBaseline='alphabetic';g.fillStyle=moss;g.font=`800 300px ${NUM}`;const num=String(st.cur);g.fillText(num,72,470);
+    const nw=g.measureText(num).width;g.fillStyle=ink;g.font=`700 64px ${FONT}`;g.fillText('天',72+nw+24,380);
+    g.font=`500 44px ${FONT}`;g.fillText('连续不刷短视频',72+nw+24,452);
+    const by=540;g.fillStyle=muted;g.font=`400 34px ${FONT}`;g.fillText(`挑战周期 ${S.period} 天`,80,by);g.textAlign='right';g.fillText(`${Math.min(st.cur,S.period)} / ${S.period}`,W-80,by);g.textAlign='left';
+    rr(g,80,by+24,W-160,22,11);g.fillStyle=line;g.fill();const p=Math.min(1,st.cur/S.period);if(p>0){rr(g,80,by+24,Math.max(22,(W-160)*p),22,11);g.fillStyle=moss;g.fill()}
+    let y=650;g.fillStyle=muted;g.font=`700 30px ${FONT}`;g.fillText(showRewards?'我的奖励':'奖励进度',80,y);y+=30;
+    const list=S.rewards.slice().sort((a,b)=>a.days-b.days).slice(0,3);
+    if(!list.length){g.fillStyle=muted;g.font=`400 34px ${FONT}`;g.fillText('还没设置奖励',80,y+60);}
+    list.forEach((r,i)=>{const prog=r.repeat?st.cur%r.days:Math.min(st.cur,r.days),won=r.repeat?(st.cur>0&&st.cur%r.days===0):!!S.unlocked[r.id];
+      rr(g,80,y,W-160,124,24);g.fillStyle=won?'#EEE4F2':'#FFFFFF';g.fill();g.lineWidth=2;g.strokeStyle=won?heather:line;g.stroke();
+      g.fillStyle=ink;g.font=`700 40px ${FONT}`;g.fillText(fit(g,showRewards?r.name:`奖励 ${i+1}`,560),116,y+56);
+      g.fillStyle=won?heather:muted;g.font=`600 34px ${FONT}`;g.textAlign='right';g.fillText(won?'已解锁':`${prog} / ${r.days} 天${r.repeat?' · 循环':''}`,W-116,y+56);g.textAlign='left';
+      rr(g,116,y+82,W-232,14,7);g.fillStyle=line;g.fill();const q=won?1:prog/r.days;if(q>0){rr(g,116,y+82,Math.max(14,(W-232)*q),14,7);g.fillStyle=heather;g.fill()}
+      y+=148});
+    const fy=H-264;g.fillStyle='#FFFFFF';rr(g,60,fy,W-120,232,28);g.fill();
+    const qc=document.createElement('canvas');if(isHttp&&drawQR(qc,APP_URL,200))g.drawImage(qc,88,fy+16,200,200);
+    const tx=isHttp?320:100;g.fillStyle=ink;g.font=`700 44px ${FONT}`;g.fillText(isHttp?'扫码，一起不刷了':'一起不刷了',tx,fy+92);
+    g.fillStyle=muted;g.font=`400 32px ${FONT}`;g.fillText('自己定奖励和惩罚 · 不用注册',tx,fy+146);
+    g.font=`400 26px ${FONT}`;g.fillText(fit(g,APP_URL.replace(/^https?:\/\//,''),W-tx-100),tx,fy+192);
     return cv}
   function openCard(){
     let show=true,cv=drawCard(show);
