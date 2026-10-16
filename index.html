@@ -3,31 +3,37 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>戒刷打卡</title>
-<meta name="description" content="戒掉刷短视频：每天一键打卡，自己定周期、奖励和惩罚。数据只存在你自己的手机上。">
-<meta name="theme-color" content="#2F6B4F" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#121614" media="(prefers-color-scheme: dark)">
+<title>不刷了</title>
+<meta name="description" content="不刷了：戒掉刷短视频。每天一键打卡，自己定周期、奖励和惩罚。数据只存在你自己的手机上。">
+<meta name="theme-color" content="#F3F6F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1719" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="戒刷打卡">
+<meta name="apple-mobile-web-app-title" content="不刷了">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap">
 <style>
 /* Layout: one narrow phone column — streak hero + challenge bar, big check button, owed penalties, this week, reward ladder, 5-week grid; settings as a full-screen sheet */
 :root{
-  --bg:#F2F3EF; --surface:#FFFFFF; --ink:#1E2421; --muted:#68716B; --line:#DCE0DA;
-  --moss:#2F6B4F; --moss-soft:#DCEBE2; --heather:#7B4E8C; --heather-soft:#EEE4F2;
-  --slip:#B5483B; --slip-soft:#F6E1DD; --onaccent:#FFFFFF;
-  --f-num:"DIN Alternate","Avenir Next","Segoe UI",Roboto,"PingFang SC",system-ui,sans-serif;
+  --bg:#F3F6F1; --surface:#FFFFFF; --ink:#1C2B27; --muted:#667873; --line:#DFE7E1;
+  --moss:#2F8559; --moss-2:#4AA772; --moss-soft:#E2F2E7; --heather:#D9792C; --heather-soft:#FDF0E2;
+  --slip:#C4553F; --slip-soft:#FAE3DC; --onaccent:#FFFFFF;
+  --sky-top:#BFE0F2; --sky-mid:#E6F1EE; --sky-bot:#FCEBD4; --hill-far:#A9D3AC; --hill-near:#6DB385; --sun-core:#FFF6D6; --sun-glow:#FFC56E;
+  --shadow:0 1px 2px rgba(28,43,39,.05),0 8px 24px rgba(28,43,39,.07);
+  --f-num:"Nunito","Avenir Next","Segoe UI",Roboto,"PingFang SC",system-ui,sans-serif;
   --f-body:"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){:root{
-  --bg:#121614; --surface:#1B201D; --ink:#E9EEEA; --muted:#97A29B; --line:#2C3430;
-  --moss:#6CC197; --moss-soft:#1F3329; --heather:#C59BD6; --heather-soft:#2E2433;
-  --slip:#E7887B; --slip-soft:#3A2220; --onaccent:#0E1411; color-scheme:dark }}
+  --bg:#0E1719; --surface:#162225; --ink:#E5EFEA; --muted:#92A59F; --line:#24343A;
+  --moss:#5CC48A; --moss-2:#3E9E68; --moss-soft:#183126; --heather:#F2AE62; --heather-soft:#3A2A19;
+  --slip:#EE8A74; --slip-soft:#3A221D; --onaccent:#0C1612;
+  --sky-top:#13253C; --sky-mid:#273450; --sky-bot:#5B4757; --hill-far:#1F3B33; --hill-near:#142A23; --sun-core:#FFE7B8; --sun-glow:#F09A5A;
+  --shadow:0 1px 0 rgba(0,0,0,.25); color-scheme:dark }}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;-webkit-tap-highlight-color:transparent}
@@ -36,27 +42,36 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);fo
 h1,h2,h3{margin:0}
 .top{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .top h1{font-size:15px;font-weight:700;letter-spacing:.04em}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.brand svg{width:36px;height:36px;flex:none}
+.brand h1{font-size:20px;font-weight:900;letter-spacing:.08em;line-height:1.1}
+.brand span{display:block;font-size:12px;color:var(--muted);letter-spacing:.06em}
 .top .r{display:flex;align-items:center;gap:10px}
 .top .date{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
-.gear{appearance:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;width:36px;height:36px;display:grid;place-items:center;cursor:pointer;color:var(--muted)}
+.gear{appearance:none;border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow);border-radius:999px;width:36px;height:36px;display:grid;place-items:center;cursor:pointer;color:var(--muted)}
 .gear svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 
-.hero{display:flex;flex-direction:column;gap:12px}
-.hero .row1{display:flex;align-items:flex-end;gap:14px}
-.big{font-family:var(--f-num);font-weight:800;font-size:96px;line-height:.85;letter-spacing:-.04em;font-variant-numeric:tabular-nums;color:var(--moss)}
-.hero .lbl{padding-bottom:6px;min-width:0}
+.hero{position:relative;border-radius:28px;overflow:hidden;background:linear-gradient(180deg,var(--sky-top) 0%,var(--sky-mid) 55%,var(--sky-bot) 100%);box-shadow:var(--shadow);min-height:252px;isolation:isolate}
+.sun{position:absolute;right:14%;width:88px;height:88px;border-radius:50%;top:calc(58% - var(--sun,0) * 46%);background:radial-gradient(circle,var(--sun-core) 0 34%,var(--sun-glow) 36% 46%,color-mix(in srgb,var(--sun-glow) 30%,transparent) 58%,transparent 72%);transition:top 1.2s ease;z-index:0}
+.hills{position:absolute;left:0;right:0;bottom:0;width:100%;height:96px;z-index:1}
+.hills .far{fill:var(--hill-far)}.hills .near{fill:var(--hill-near)}
+.hero-in{position:relative;z-index:2;padding:22px 20px 18px;display:flex;flex-direction:column;gap:14px;min-height:252px}
+.hero .row1{display:flex;align-items:flex-end;gap:12px}
+.big{font-family:var(--f-num);font-weight:900;font-size:104px;line-height:.82;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--ink)}
+.hero .lbl{padding-bottom:8px;min-width:0}
 .hero .lbl b{display:block;font-size:18px}
 .hero .lbl span{color:var(--muted);font-size:13px}
-.goal{display:flex;flex-direction:column;gap:5px}
+.goal{margin-top:auto;display:flex;flex-direction:column;gap:6px;background:color-mix(in srgb,var(--surface) 82%,transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:16px;padding:10px 12px}
 .goal .t{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
-.goal .track{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
-.goal .track i{display:block;height:100%;background:var(--moss);border-radius:99px;transition:width .5s}
+.goal .t span:last-child{font-family:var(--f-num);font-weight:800;color:var(--ink)}
+.goal .track{height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.goal .track i{display:block;height:100%;background:linear-gradient(90deg,var(--moss-2),var(--moss));border-radius:99px;transition:width .6s}
 
-.check{appearance:none;border:0;width:100%;border-radius:22px;padding:22px 18px;font:inherit;font-size:20px;font-weight:900;letter-spacing:.06em;background:var(--moss);color:var(--onaccent);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .12s}
+.check{appearance:none;border:0;width:100%;border-radius:24px;padding:22px 18px;font:inherit;font-size:20px;font-weight:900;letter-spacing:.06em;background:linear-gradient(180deg,var(--moss-2),var(--moss));box-shadow:0 10px 24px color-mix(in srgb,var(--moss) 30%,transparent);color:var(--onaccent);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .12s}
 .check small{font-size:13px;font-weight:500;letter-spacing:0;opacity:.85}
 .check:active{transform:scale(.98)}
-.check.done{background:var(--moss-soft);color:var(--moss)}
-.check.slipped{background:var(--slip-soft);color:var(--slip)}
+.check.done{background:var(--moss-soft);color:var(--moss);box-shadow:none}
+.check.slipped{background:var(--slip-soft);color:var(--slip);box-shadow:none}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--heather);outline-offset:2px}
 .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
 .row.l{justify-content:flex-start}
@@ -67,11 +82,12 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .btn.on{background:var(--moss);color:var(--onaccent);border-color:var(--moss)}
 .btn.sm{padding:5px 11px;font-size:12px}
 
-.sec h2{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--muted);margin-bottom:10px}
+.sec h2{font-size:13px;font-weight:800;letter-spacing:.12em;color:var(--ink);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.sec h2::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--heather)}
 .week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
 .wd{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
-.dot{width:100%;max-width:40px;aspect-ratio:1;border-radius:50%;border:2px dashed var(--line);display:grid;place-items:center;font-family:var(--f-num);font-weight:600;font-size:14px;color:var(--muted)}
-.dot.ok{background:var(--moss);border:2px solid var(--moss);color:var(--onaccent)}
+.dot{width:100%;max-width:40px;aspect-ratio:1;border-radius:50%;border:2px dashed var(--line);display:grid;place-items:center;font-family:var(--f-num);font-weight:800;font-size:14px;color:var(--muted)}
+.dot.ok{background:linear-gradient(180deg,var(--moss-2),var(--moss));border:2px solid var(--moss);color:var(--onaccent)}
 .dot.bad{background:var(--slip-soft);border:2px solid var(--slip);color:var(--slip)}
 .dot.today{border-style:solid;border-color:var(--ink);color:var(--ink)}
 .dot.ok.today{border-color:var(--moss);color:var(--onaccent)}
@@ -85,14 +101,14 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .debt .btn{border-color:var(--slip);color:var(--slip);background:var(--surface);white-space:nowrap}
 
 .ladder{display:flex;flex-direction:column;gap:10px}
-.rung{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:4px 14px;align-items:center}
+.rung{background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:20px;padding:14px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:4px 14px;align-items:center}
 .rung .ic{grid-row:span 2;width:44px;height:44px;border-radius:12px;background:var(--heather-soft);display:grid;place-items:center}
 .rung .ic svg{width:26px;height:26px;stroke:var(--heather);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .rung .name{font-weight:700;font-size:16px;min-width:0;overflow-wrap:anywhere}
 .rung .name em{font-style:normal;font-weight:500;color:var(--muted);font-size:13px;margin-left:6px;white-space:nowrap}
-.rung .count{font-family:var(--f-num);font-weight:600;font-variant-numeric:tabular-nums;font-size:14px;color:var(--muted);white-space:nowrap}
+.rung .count{font-family:var(--f-num);font-weight:800;font-variant-numeric:tabular-nums;font-size:14px;color:var(--muted);white-space:nowrap}
 .bar{grid-column:2/4;height:8px;border-radius:99px;background:var(--line);overflow:hidden}
-.bar i{display:block;height:100%;background:var(--heather);border-radius:99px;transition:width .5s}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--sun-glow),var(--heather));border-radius:99px;transition:width .5s}
 .rung.won{border-color:var(--heather);background:var(--heather-soft)}
 .rung.won .ic{background:var(--heather)}
 .rung.won .ic svg{stroke:var(--onaccent)}
@@ -102,7 +118,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 
 .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
 .gh{font-size:11px;color:var(--muted);text-align:center}
-.cell{aspect-ratio:1;border-radius:6px;background:var(--line);opacity:.55}
+.cell{aspect-ratio:1;border-radius:8px;background:var(--line);opacity:.55}
 .cell.ok{background:var(--moss);opacity:1}
 .cell.bad{background:var(--slip);opacity:1}
 .cell.future{background:transparent;border:1px dashed var(--line);opacity:1}
@@ -111,11 +127,54 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .legend span{display:inline-flex;align-items:center;gap:5px}
 .legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
 
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px}
-.stat b{display:block;font-family:var(--f-num);font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:18px;padding:10px}
+.stat b{display:block;font-family:var(--f-num);font-size:24px;font-weight:900;font-variant-numeric:tabular-nums}
 .stat span{font-size:11px;color:var(--muted)}
-@media (max-width:360px){.stats{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:340px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+/* quick tools under the check button */
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tool{appearance:none;font:inherit;text-align:left;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:20px;padding:12px 14px;cursor:pointer;display:flex;gap:10px;align-items:center;color:var(--ink)}
+.tool svg{width:26px;height:26px;flex:none;stroke:var(--heather);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tool b{display:block;font-size:15px}
+.tool span{display:block;font-size:12px;color:var(--muted)}
+.tool.urge{border-color:var(--heather);background:var(--heather-soft)}
+
+/* bottom sheet */
+.bsheet{position:fixed;inset:0;z-index:35;background:color-mix(in srgb,var(--ink) 35%,transparent);display:flex;align-items:flex-end;justify-content:center}
+.bsheet .panel{background:var(--bg);width:100%;max-width:460px;max-height:92vh;overflow-y:auto;border-radius:22px 22px 0 0;padding:18px max(16px,env(safe-area-inset-left,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+.bsheet .ph{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.bsheet .ph h2{font-size:17px}
+.bsheet .close{appearance:none;border:0;background:var(--surface);color:var(--muted);width:32px;height:32px;border-radius:50%;font-size:18px;cursor:pointer}
+.sgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.sbtn{appearance:none;font:inherit;text-decoration:none;background:none;border:0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:var(--ink);padding:4px 0}
+.sbtn i{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:var(--surface);border:1px solid var(--line)}
+.sbtn i svg{width:26px;height:26px;stroke:var(--ink);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.sbtn.wx i{background:#07C160;border-color:#07C160}.sbtn.wa i{background:#25D366;border-color:#25D366}
+.sbtn.wx i svg,.sbtn.wa i svg{stroke:#FFFFFF}
+.linkbox{display:flex;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.linkbox .btn{white-space:nowrap;flex:none}
+.linkbox input{border:0;background:none;padding:0;font-size:14px;color:var(--muted)}
+.wxbox{display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;text-align:center;font-size:13px;color:var(--muted)}
+.wxbox canvas{width:180px;height:180px;background:#FFFFFF;border-radius:8px}
+.cardimg{width:100%;border-radius:16px;border:1px solid var(--line);background:var(--surface)}
+.tiny{font-size:12px;color:var(--muted);margin:0;text-align:center}
+
+/* urge helper */
+.ring{position:relative;width:180px;height:180px;margin:0 auto}
+.ring svg{width:180px;height:180px;transform:rotate(-90deg)}
+.ring .t{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--f-num);font-size:40px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--heather)}
+.idea{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;text-align:center}
+.idea small{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.idea b{font-size:19px;overflow-wrap:anywhere}
+
+/* templates */
+.tpls{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tpl{appearance:none;font:inherit;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px;cursor:pointer;color:var(--ink)}
+.tpl b{display:block;font-size:14px}
+.tpl span{display:block;font-size:11px;color:var(--muted);margin-top:2px}
+@media (max-width:360px){.tpls{grid-template-columns:1fr}.sgrid{grid-template-columns:repeat(3,1fr)}}
 
 .note{font-size:12px;color:var(--muted);text-align:center;margin:0}
 .hint{background:var(--surface);border:1px dashed var(--moss);border-radius:14px;padding:12px 14px;font-size:13px;display:flex;gap:10px;align-items:flex-start}
@@ -137,7 +196,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .alarm button{appearance:none;border:0;background:var(--onaccent);color:var(--heather);font:inherit;font-weight:700;border-radius:999px;padding:8px 14px;cursor:pointer;white-space:nowrap}
 .alarm.ring{animation:ring 1s ease-in-out 3}
 @keyframes ring{0%,100%{transform:none}20%{transform:rotate(-1.5deg)}40%{transform:rotate(1.5deg)}60%{transform:rotate(-1deg)}80%{transform:rotate(1deg)}}
-.remind{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.remind{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:18px;padding:12px 14px}
 .remind b{display:block;font-size:15px}
 .remind span{font-size:12px;color:var(--muted)}
 
@@ -173,21 +232,31 @@ label.ck input{width:18px;height:18px;accent-color:var(--moss)}
 </head>
 <body>
 <div class="wrap" id="main">
-  <div class="top"><h1>戒刷短视频</h1><div class="r"><span class="date" id="today"></span>
+  <div class="top"><div class="brand"><svg viewBox="0 0 36 36" aria-hidden="true"><rect width="36" height="36" rx="11" fill="var(--sky-top)"/><circle cx="23" cy="15" r="6" fill="var(--sun-glow)"/><path d="M0 26c6-5 12-6 18-3s12 2 18-2v15H0z" fill="var(--hill-near)"/></svg><div><h1>不刷了</h1><span id="today"></span></div></div><div class="r">
+    <button class="gear" id="openShare" type="button" aria-label="分享给朋友"><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button>
     <button class="gear" id="openSet" type="button" aria-label="设置"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></div></div>
 
   <div class="hint" id="installHint" hidden><div><b>先装到主屏幕</b><span id="installTxt"></span></div><button class="x" type="button" id="hintX" aria-label="关闭">×</button></div>
 
-  <div class="hero">
-    <div class="row1"><div class="big" id="streak">0</div>
-      <div class="lbl"><b>天连续不刷</b><span id="next">打第一次卡，开始计数</span></div></div>
-    <div class="goal"><div class="t"><span id="goalLbl">挑战 365 天</span><span id="goalNum">0 / 365</span></div><div class="track"><i id="goalBar" style="width:0"></i></div></div>
+  <div class="hero" id="hero">
+    <div class="sun" aria-hidden="true"></div>
+    <svg class="hills" viewBox="0 0 400 96" preserveAspectRatio="none" aria-hidden="true"><path class="far" d="M0 44C70 18 140 22 210 42S330 52 400 26V96H0Z"/><path class="near" d="M0 74C60 56 130 58 200 72S330 84 400 64V96H0Z"/></svg>
+    <div class="hero-in">
+      <div class="row1"><div class="big" id="streak">0</div>
+        <div class="lbl"><b>天没刷短视频</b><span id="next">打第一次卡，开始计数</span></div></div>
+      <div class="goal"><div class="t"><span id="goalLbl">挑战 365 天</span><span id="goalNum">0 / 365</span></div><div class="track"><i id="goalBar" style="width:0"></i></div></div>
+    </div>
   </div>
 
   <div class="alarm" id="alarm" role="alert" hidden><div><b id="alarmTitle">23:00 了，今天还没打卡</b><span>没刷短视频就点右边，刷了也如实记一下</span></div><button type="button" id="alarmBtn">去打卡</button></div>
 
   <button class="check" id="checkBtn" type="button"><span id="checkTxt">今天没刷短视频 · 打卡</span><small id="checkSub">点一下就完成</small></button>
   <div class="row" id="actions"></div>
+
+  <div class="tools">
+    <button class="tool urge" type="button" id="openUrge"><svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg><div><b>我想刷了</b><span>先忍 3 分钟</span></div></button>
+    <button class="tool" type="button" id="openCard"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg><div><b>打卡分享图</b><span>发群、发朋友圈</span></div></button>
+  </div>
 
   <section class="sec" id="owedSec" hidden><h2>待完成的惩罚</h2><div class="owed" id="owed"></div></section>
 
@@ -204,6 +273,8 @@ label.ck input{width:18px;height:18px;accent-color:var(--moss)}
     <div class="stat"><b id="sTotal">0</b><span>累计没刷</span></div>
     <div class="stat"><b id="sSlip">0</b><span>破戒次数</span></div>
     <div class="stat"><b id="sPen">0</b><span>惩罚已完成</span></div>
+    <div class="stat"><b id="sUrge">0</b><span>忍住冲动</span></div>
+    <div class="stat"><b id="sRw">0</b><span>已领奖励</span></div>
   </div>
 
   <p class="note" id="rules"></p>
@@ -213,6 +284,12 @@ label.ck input{width:18px;height:18px;accent-color:var(--moss)}
   <div class="wrap">
     <div class="top"><h1 id="setTitle">设置</h1><button class="btn primary" type="button" id="saveSet">保存</button></div>
     <p class="intro" id="setIntro" hidden>目标只有一个：戒掉刷短视频。下面的周期、奖励和惩罚按你自己的情况来定，以后随时可以在右上角齿轮里修改。</p>
+
+    <div class="grp">
+      <h3>套用模板</h3>
+      <p>不知道怎么定？先选一个模板，下面的周期、奖励和惩罚会自动填好，再按自己的情况改。</p>
+      <div class="tpls" id="tpls"></div>
+    </div>
 
     <div class="grp">
       <h3>挑战周期</h3>
@@ -225,15 +302,17 @@ label.ck input{width:18px;height:18px;accent-color:var(--moss)}
       <h3>奖励</h3>
       <p>连续不刷满对应天数就解锁。勾选"循环"的奖励每满一次都能领，比如每连续 7 天奖励一次。</p>
       <div id="rwList" style="display:flex;flex-direction:column;gap:8px"></div>
-      <div class="row l"><button class="btn" type="button" id="addRw">＋ 添加奖励</button></div>
+      <div class="row l"><button class="btn" type="button" id="addRw">＋ 自己写一个奖励</button></div>
+      <span class="lab">常用奖励，点一下添加（天数可以再改）</span>
+      <div class="chips" id="rwChips"></div>
     </div>
 
     <div class="grp">
       <h3>惩罚</h3>
       <p>"刷了"是你主动记下的破戒；"漏打卡"是某天既没打卡也没补卡（第二天还可以补，过了才算漏）。触发后会出现在首页的待办里，做完点"完成"。</p>
       <div id="penList" style="display:flex;flex-direction:column;gap:8px"></div>
-      <div class="row l"><button class="btn" type="button" id="addPen">＋ 添加惩罚</button></div>
-      <span class="lab">常用惩罚，点一下添加</span>
+      <div class="row l"><button class="btn" type="button" id="addPen">＋ 自己写一个惩罚</button></div>
+      <span class="lab">常用惩罚，点一下添加（触发条件可以再改）</span>
       <div class="chips" id="penChips"></div>
     </div>
 
@@ -262,6 +341,7 @@ label.ck input{width:18px;height:18px;accent-color:var(--moss)}
   </div>
 </div>
 
+<script src="qrcode.js"></script>
 <script>
 (function(){
   'use strict';
@@ -272,6 +352,7 @@ label.ck input{width:18px;height:18px;accent-color:var(--moss)}
   ];
   const TROPHY='<svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>';
   const PERIODS=[21,30,66,100,365];
+  const RW_PRESETS=[{name:'一顿想吃很久的大餐',days:7,repeat:true},{name:'看一场电影',days:7,repeat:true},{name:'买一本想要的书',days:14,repeat:false},{name:'一双新鞋',days:7,repeat:false},{name:'一件新衣服',days:30,repeat:false},{name:'做一次按摩 / SPA',days:30,repeat:false},{name:'一场演唱会',days:66,repeat:false},{name:'想要的电子产品',days:100,repeat:false},{name:'一次短途旅行',days:100,repeat:false},{name:'一次远途旅行',days:365,repeat:false}];
   const PEN_PRESETS=['做 50 个深蹲','跑步 3 公里','存 50 元进奖励基金','给朋友发 20 元红包','做一次全屋家务','当晚 22:30 前上床','一周不点外卖奶茶','读 30 页书'];
   const WD=['日','一','二','三','四','五','六'];
   const KEY='jieshua-v1';
@@ -281,7 +362,7 @@ label.ck input{width:18px;height:18px;accent-color:var(--moss)}
     {id:uid(),name:'一件想要很久的东西',days:30,repeat:false},
     {id:uid(),name:'一次旅行',days:365,repeat:false}];
   const DEFAULT_PENS=()=>[{id:uid(),name:'做 50 个深蹲',trigger:'slip'},{id:uid(),name:'存 20 元进奖励基金',trigger:'miss'}];
-  const blank=()=>({v:2,setup:false,period:365,rewards:DEFAULT_REWARDS(),penalties:DEFAULT_PENS(),days:{},unlocked:{},owed:[],missIssued:{},remind:'23:00',bell:true,hintClosed:false});
+  const blank=()=>({v:2,setup:false,period:365,rewards:DEFAULT_REWARDS(),penalties:DEFAULT_PENS(),days:{},unlocked:{},owed:[],missIssued:{},urges:{},remind:'23:00',bell:true,hintClosed:false});
   let S=blank(),armedSlip=false,armedReset=false,draft=null;
 
   const $=id=>document.getElementById(id);
@@ -313,6 +394,7 @@ label.ck input{width:18px;height:18px;accent-color:var(--moss)}
         else if(u&&u.date)r.unlocked[k]={date:u.date,name:String(u.name||''),rid:u.rid||k}})}
     r.owed=Array.isArray(o.owed)?o.owed.filter(x=>x&&x.name&&x.date).map(x=>({id:x.id||uid(),name:String(x.name),date:x.date,trigger:x.trigger==='miss'?'miss':'slip',done:x.done||null})):[];
     r.missIssued=(o.missIssued&&typeof o.missIssued==='object')?{...o.missIssued}:{};
+    r.urges={};if(o.urges&&typeof o.urges==='object')Object.keys(o.urges).forEach(k=>{const n=parseInt(o.urges[k]);if(/^\d{4}-\d{2}-\d{2}$/.test(k)&&n>0)r.urges[k]=n});
     // older data (v1) already had rules set by the person; skip first-run setup
     r.setup=o.v===2?!!o.setup:true;
     return r}
@@ -352,7 +434,7 @@ label.ck input{width:18px;height:18px;accent-color:var(--moss)}
 
   function render(){
     const t=todayD(),tk=ds(t),yk=ds(addDays(t,-1));
-    $('today').textContent=`${t.getMonth()+1}月${t.getDate()}日 周${WD[t.getDay()]}`;
+    $('today').textContent=`${t.getMonth()+1}月${t.getDate()}日 · 周${WD[t.getDay()]}`;
     if(issueMissed())save();
     const st=streakInfo();
     $('streak').textContent=st.cur;
@@ -361,7 +443,7 @@ label.ck input{width:18px;height:18px;accent-color:var(--moss)}
     const nexts=order.map(r=>({r,need:r.repeat?r.days-(st.cur%r.days):r.days-st.cur})).filter(x=>x.need>0&&(x.r.repeat||!S.unlocked[x.r.id])).sort((a,b)=>a.need-b.need);
     $('next').textContent=!Object.keys(S.days).length?'打第一次卡，开始计数':st.cur>=S.period?'挑战完成，继续保持':nexts.length?`再坚持 ${nexts[0].need} 天 → ${nexts[0].r.name}`:`离挑战完成还有 ${S.period-st.cur} 天`;
     $('goalLbl').textContent=`挑战周期 ${S.period} 天`;$('goalNum').textContent=`${Math.min(st.cur,S.period)} / ${S.period}`;
-    $('goalBar').style.width=(Math.min(1,st.cur/S.period)*100).toFixed(1)+'%';
+    $('goalBar').style.width=(Math.min(1,st.cur/S.period)*100).toFixed(1)+'%';$('hero').style.setProperty('--sun',Math.min(1,st.cur/S.period).toFixed(3));
 
     const btn=$('checkBtn'),tv=S.days[tk];
     btn.className='check'+(tv===1?' done':tv===0?' slipped':'');
@@ -408,6 +490,7 @@ label.ck input{width:18px;height:18px;accent-color:var(--moss)}
 
     $('sBest').textContent=st.best;$('sTotal').textContent=st.total;$('sSlip').textContent=st.slips;
     const pdone=S.owed.filter(o=>o.done).length;$('sPen').textContent=S.owed.length?pdone+'/'+S.owed.length:'0';
+    $('sUrge').textContent=Object.values(S.urges).reduce((a,b)=>a+b,0);$('sRw').textContent=Object.values(S.unlocked).filter(u=>u.rid!=='challenge').length;
     $('remindTitle').textContent=`每晚 ${S.remind} 提醒`;$('alarmTitle').textContent=`${S.remind} 了，今天还没打卡`;
     const hasSlipPen=S.penalties.some(p=>p.trigger==='slip'),hasMissPen=S.penalties.some(p=>p.trigger==='miss');
     $('rules').innerHTML='规则：每天打卡一次；漏打或"刷了"都会让连续天数归零。忘了打卡，第二天可以补昨天。'+
@@ -482,6 +565,9 @@ label.ck input{width:18px;height:18px;accent-color:var(--moss)}
       d.querySelector(`#penName_${p.id}`).oninput=e=>p.name=e.target.value;
       d.querySelector(`#penTrig_${p.id}`).onchange=e=>p.trigger=e.target.value;
       d.querySelector('.del').onclick=()=>{draft.penalties.splice(i,1);drawPens()};l.appendChild(d)})}
+  function drawRwChips(){const c=$('rwChips');c.innerHTML='';
+    RW_PRESETS.forEach(r=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent=`＋ ${r.name} · ${r.repeat?'每 ':''}${r.days} 天`;
+      b.onclick=()=>{draft.rewards.push({id:uid(),...r});drawRewards();toast('已添加，可以改名字和天数')};c.appendChild(b)})}
   function drawPenChips(){const c=$('penChips');c.innerHTML='';
     PEN_PRESETS.forEach(n=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent='＋ '+n;
       b.onclick=()=>{draft.penalties.push({id:uid(),name:n,trigger:'slip'});drawPens();toast('已添加，可以改触发条件')};c.appendChild(b)})}
@@ -493,7 +579,7 @@ label.ck input{width:18px;height:18px;accent-color:var(--moss)}
     const first=!S.setup;
     $('setTitle').textContent=first?'定一个你自己的戒断计划':'设置';$('saveSet').textContent=first?'开始挑战':'保存';
     $('setIntro').hidden=!first;$('backupCard').hidden=first;$('resetCard').hidden=first;$('closeSet').hidden=first;
-    drawPeriod();drawRewards();drawPens();drawPenChips();
+    drawTemplates();drawPeriod();drawRewards();drawRwChips();drawPens();drawPenChips();
     $('remindTime').value=S.remind;$('impText').value='';armedReset=false;$('resetBtn').textContent='清空记录';$('resetBtn').className='btn warn';
     $('sheet').hidden=false;$('main').hidden=true;window.scrollTo(0,0);$('sheet').scrollTop=0}
   function closeSettings(){$('sheet').hidden=true;$('main').hidden=false;render()}
@@ -509,17 +595,166 @@ label.ck input{width:18px;height:18px;accent-color:var(--moss)}
     S.setup=true;rungFor=null;save();closeSettings();toast(first?'计划定好了，今天就开始':'设置已保存')};
 
   function backupText(){return JSON.stringify({app:'jieshua',exported:new Date().toISOString(),...S})}
-  $('expFile').onclick=()=>{try{const blob=new Blob([backupText()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='戒刷打卡备份-'+ds(todayD())+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);toast('备份文件已生成')}catch(e){toast('下载失败，请改用"复制备份文字"')}};
+  $('expFile').onclick=()=>{try{const blob=new Blob([backupText()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='不刷了备份-'+ds(todayD())+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);toast('备份文件已生成')}catch(e){toast('下载失败，请改用"复制备份文字"')}};
   $('expCopy').onclick=()=>{const t=backupText();const fallback=()=>{const ta=$('impText');ta.value=t;ta.focus();ta.select();toast('已选中备份文字，请手动复制')};
     try{navigator.clipboard.writeText(t).then(()=>toast('备份文字已复制，存到备忘录或发给自己'),fallback)}catch(e){fallback()}};
   function restore(raw){let o;try{o=JSON.parse(raw)}catch(e){toast('备份内容无法识别，请检查是否完整');return}
-    const n=normalize(o);if(!n){toast('这不是戒刷打卡的备份');return}
+    const n=normalize(o);if(!n){toast('这不是「不刷了」的备份');return}
     n.hintClosed=S.hintClosed;n.setup=true;S=n;save();closeSettings();toast(`已恢复 ${Object.keys(S.days).length} 天的记录`)}
   $('impFileBtn').onclick=()=>$('impFile').click();
   $('impFile').onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>restore(r.result);r.readAsText(f);e.target.value=''};
   $('impTextBtn').onclick=()=>{const v=$('impText').value.trim();if(!v){toast('先把备份文字粘贴进来');return}restore(v)};
   $('resetBtn').onclick=()=>{if(!armedReset){armedReset=true;$('resetBtn').textContent='再点一次确认清空';$('resetBtn').className='btn solid-warn';setTimeout(()=>{armedReset=false;$('resetBtn').textContent='清空记录';$('resetBtn').className='btn warn'},4000);return}
     S.days={};S.unlocked={};S.owed=[];S.missIssued={};save();closeSettings();toast('记录已清空，从今天重新开始')};
+
+
+  // ---- plan templates ----
+  const TEMPLATES=[
+    {name:'温和型',desc:'30 天 · 只奖不罚为主',period:30,
+     rewards:[{name:'给自己买个小礼物',days:7,repeat:true},{name:'一件想要很久的东西',days:30,repeat:false}],
+     penalties:[{name:'做 30 个深蹲',trigger:'slip'}]},
+    {name:'严格型',desc:'66 天 · 奖罚分明',period:66,
+     rewards:[{name:'吃一顿想吃很久的大餐',days:7,repeat:true},{name:'一件想要很久的东西',days:30,repeat:false},{name:'一次短途旅行',days:66,repeat:false}],
+     penalties:[{name:'存 50 元进奖励基金',trigger:'slip'},{name:'跑步 3 公里',trigger:'slip'},{name:'做 50 个深蹲',trigger:'miss'}]},
+    {name:'学生型',desc:'21 天 · 把时间还给学习',period:21,
+     rewards:[{name:'周末看一部电影',days:7,repeat:true},{name:'买一本想要的书',days:21,repeat:false}],
+     penalties:[{name:'多背 30 个单词',trigger:'slip'},{name:'第二天早起 30 分钟学习',trigger:'miss'}]}];
+  function drawTemplates(){const c=$('tpls');c.innerHTML='';
+    TEMPLATES.forEach(t=>{const b=document.createElement('button');b.type='button';b.className='tpl';b.innerHTML=`<b>${esc(t.name)}</b><span>${esc(t.desc)}</span>`;
+      b.onclick=()=>{draft.period=t.period;draft.rewards=t.rewards.map(r=>({...r,id:uid()}));draft.penalties=t.penalties.map(p=>({...p,id:uid()}));
+        drawPeriod();drawRewards();drawPens();toast(`已套用"${t.name}"，可以再改成自己的`)};c.appendChild(b)})}
+
+  // ---- bottom sheet ----
+  function openBS(title,html,onMount){const o=document.createElement('div');o.className='bsheet';
+    o.innerHTML=`<div class="panel" role="dialog" aria-label="${esc(title)}"><div class="ph"><h2>${esc(title)}</h2><button class="close" type="button" aria-label="关闭">×</button></div>${html}</div>`;
+    let closed=false,onClose=null;const close=()=>{if(closed)return;closed=true;o.remove();if(onClose)onClose()};
+    o.querySelector('.close').onclick=close;o.addEventListener('click',e=>{if(e.target===o)close()});
+    document.body.appendChild(o);if(onMount)onClose=onMount(o,close)||null;return close}
+
+  const APP_URL=location.href.split('#')[0].split('?')[0];
+  const isHttp=/^https?:/.test(APP_URL);
+  function shareText(){const c=streakInfo().cur;return `我在用「不刷了」戒短视频${c>0?`，已经连续 ${c} 天没刷了`:''}。自己定奖励和惩罚，不用注册，打开就能用：`}
+  function copyText(t,okMsg){const fb=()=>toast('复制失败，请长按链接手动复制');try{navigator.clipboard.writeText(t).then(()=>toast(okMsg),fb)}catch(e){fb()}}
+  function drawQR(cv,text,px){try{const q=qrcode(0,'M');q.addData(text);q.make();const n=q.getModuleCount(),m=2,cell=Math.floor(px/(n+m*2)),size=cell*(n+m*2);
+      cv.width=size;cv.height=size;const g=cv.getContext('2d');g.fillStyle='#FFFFFF';g.fillRect(0,0,size,size);g.fillStyle='#1E2421';
+      for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(q.isDark(r,c))g.fillRect((c+m)*cell,(r+m)*cell,cell,cell);return true}catch(e){return false}}
+
+  const IC={
+    sys:'<svg viewBox="0 0 24 24"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4M12 2v13"/></svg>',
+    wx:'<svg viewBox="0 0 24 24"><path d="M9.5 4C5.4 4 2 6.8 2 10.2c0 1.9 1 3.6 2.7 4.7L4 17l2.6-1.3c.9.3 1.9.4 2.9.4"/><path d="M15.5 9c-3.6 0-6.5 2.4-6.5 5.3s2.9 5.3 6.5 5.3c.8 0 1.6-.1 2.3-.3L20 20.5l-.6-2c1.6-1 2.6-2.5 2.6-4.2C22 11.4 19.1 9 15.5 9z"/></svg>',
+    wa:'<svg viewBox="0 0 24 24"><path d="M3.5 20.5l1.3-4A8.5 8.5 0 1 1 8 19.6z"/><path d="M9 8.5c0 3 2.5 6.5 6.5 6.5l1-1.5-2-1-1 1c-1-.5-2.5-2-3-3l1-1-1-2z"/></svg>',
+    mail:'<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>',
+    sms:'<svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.5A8 8 0 1 1 21 12z"/></svg>',
+    link:'<svg viewBox="0 0 24 24"><path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></svg>',
+    img:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="2"/><path d="M21 15l-5-5L5 21"/></svg>'};
+
+  // ---- share the app ----
+  function openShare(){
+    const t=shareText(),full=t+APP_URL,enc=encodeURIComponent;
+    const sys=navigator.share?`<button class="sbtn" type="button" data-a="sys"><i>${IC.sys}</i>更多应用</button>`:'';
+    const html=`<p class="tiny" style="text-align:left">把「不刷了」发给想一起戒短视频的朋友。每个人的记录都只在自己手机上。</p>
+      <div class="sgrid">
+        <button class="sbtn wx" type="button" data-a="wx"><i>${IC.wx}</i>微信</button>
+        <a class="sbtn wa" href="https://wa.me/?text=${enc(full)}" target="_blank" rel="noopener"><i>${IC.wa}</i>WhatsApp</a>
+        <a class="sbtn" href="mailto:?subject=${enc('一起戒短视频：不刷了')}&body=${enc(full)}"><i>${IC.mail}</i>邮件</a>
+        <a class="sbtn" href="sms:?&body=${enc(full)}"><i>${IC.sms}</i>短信</a>
+        <button class="sbtn" type="button" data-a="copy"><i>${IC.link}</i>复制链接</button>
+        <button class="sbtn" type="button" data-a="card"><i>${IC.img}</i>打卡图</button>
+        ${sys}
+      </div>
+      <div class="wxbox" id="wxbox" hidden><canvas id="wxqr" aria-label="不刷了网址二维码"></canvas>
+        <span>微信里网页不能直接拉起分享。两种方法：<br>1. 点"复制链接"，粘贴到微信聊天里发出去；<br>2. 让朋友用微信"扫一扫"这个二维码。</span>
+        <button class="btn primary" type="button" data-a="copy">复制链接</button></div>
+      <div class="linkbox"><input type="text" id="shareUrl" readonly value="${esc(APP_URL)}" aria-label="App 网址"><button class="btn sm" type="button" data-a="copy">复制</button></div>
+      ${isHttp?'':'<p class="tiny">提示：现在是本地文件打开的，链接要发布到网上后才能分享给别人。</p>'}`;
+    openBS('分享给朋友',html,(o,close)=>{
+      o.querySelectorAll('[data-a]').forEach(b=>b.addEventListener('click',()=>{const a=b.dataset.a;
+        if(a==='copy')copyText(full,'链接已复制，去微信或其他 App 粘贴');
+        else if(a==='wx'){const w=o.querySelector('#wxbox');w.hidden=!w.hidden;if(!w.hidden){drawQR(o.querySelector('#wxqr'),APP_URL,360);w.scrollIntoView({block:'nearest'})}}
+        else if(a==='sys'){navigator.share({title:'不刷了',text:t,url:APP_URL}).catch(()=>{})}
+        else if(a==='card'){close();openCard()}}));
+      o.querySelector('#shareUrl').addEventListener('focus',e=>e.target.select())})}
+  $('openShare').onclick=openShare;
+
+  // ---- check-in share image ----
+  const FONT='"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",sans-serif';
+  function fit(g,text,maxW){if(g.measureText(text).width<=maxW)return text;let t=text;while(t.length>1&&g.measureText(t+'…').width>maxW)t=t.slice(0,-1);return t+'…'}
+  function rr(g,x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+  function drawCard(showRewards){
+    const W=1080,H=1440,cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');
+    const st=streakInfo(),t=todayD(),moss='#2F8559',moss2='#4AA772',amber='#D9792C',ink='#1C2B27',muted='#667873',line='#DFE7E1';
+    const NUM=`"Nunito","Avenir Next",${FONT}`;
+    g.fillStyle='#F3F6F1';g.fillRect(0,0,W,H);
+    // dawn sky with sun rising by progress, hills
+    const skyH=640,sky=g.createLinearGradient(0,0,0,skyH);sky.addColorStop(0,'#BFE0F2');sky.addColorStop(.55,'#E6F1EE');sky.addColorStop(1,'#FCEBD4');
+    g.fillStyle=sky;g.fillRect(0,0,W,skyH);
+    const prog=Math.min(1,st.cur/S.period),sx=W*0.78,sy=skyH*0.62-prog*skyH*0.44;
+    const sun=g.createRadialGradient(sx,sy,0,sx,sy,170);sun.addColorStop(0,'#FFF6D6');sun.addColorStop(.3,'#FFF6D6');sun.addColorStop(.33,'#FFC56E');sun.addColorStop(.45,'rgba(255,197,110,.9)');sun.addColorStop(.6,'rgba(255,197,110,.3)');sun.addColorStop(1,'rgba(255,197,110,0)');
+    g.fillStyle=sun;g.fillRect(sx-180,sy-180,360,360);
+    g.fillStyle='#A9D3AC';g.beginPath();g.moveTo(0,skyH-170);g.bezierCurveTo(200,skyH-240,380,skyH-230,560,skyH-180);g.bezierCurveTo(740,skyH-130,900,skyH-160,W,skyH-230);g.lineTo(W,skyH);g.lineTo(0,skyH);g.fill();
+    g.fillStyle='#6DB385';g.beginPath();g.moveTo(0,skyH-80);g.bezierCurveTo(160,skyH-130,340,skyH-125,540,skyH-90);g.bezierCurveTo(740,skyH-55,880,skyH-70,W,skyH-110);g.lineTo(W,skyH);g.lineTo(0,skyH);g.fill();
+    // brand
+    rr(g,72,64,72,72,22);g.fillStyle='#FFFFFF';g.fill();g.fillStyle='#FFC56E';g.beginPath();g.arc(118,96,14,0,7);g.fill();g.fillStyle='#6DB385';g.beginPath();g.moveTo(72,118);g.bezierCurveTo(90,104,110,104,126,112);g.bezierCurveTo(134,116,140,114,144,110);g.lineTo(144,114);g.arcTo(144,136,122,136,22);g.lineTo(94,136);g.arcTo(72,136,72,114,22);g.closePath();g.fill();
+    g.textBaseline='alphabetic';g.fillStyle=ink;g.font=`900 52px ${FONT}`;g.fillText('不刷了',164,116);
+    g.font=`500 32px ${FONT}`;g.fillStyle=muted;g.textAlign='right';g.fillText(`${t.getFullYear()}.${pad(t.getMonth()+1)}.${pad(t.getDate())}`,W-80,112);g.textAlign='left';
+    g.fillStyle=ink;g.font=`900 300px ${NUM}`;const num=String(st.cur);g.fillText(num,64,440);
+    const nw=g.measureText(num).width;g.font=`800 64px ${FONT}`;g.fillText('天',64+nw+24,350);
+    g.font=`600 44px ${FONT}`;g.fillText('没刷短视频',64+nw+24,422);
+    // challenge bar
+    let y=skyH+80;g.fillStyle=muted;g.font=`500 34px ${FONT}`;g.fillText(`挑战周期 ${S.period} 天`,80,y);g.textAlign='right';g.fillStyle=ink;g.font=`800 36px ${NUM}`;g.fillText(`${Math.min(st.cur,S.period)} / ${S.period}`,W-80,y);g.textAlign='left';
+    rr(g,80,y+22,W-160,22,11);g.fillStyle=line;g.fill();if(prog>0){rr(g,80,y+22,Math.max(22,(W-160)*prog),22,11);const gr=g.createLinearGradient(80,0,W-80,0);gr.addColorStop(0,moss2);gr.addColorStop(1,moss);g.fillStyle=gr;g.fill()}
+    // rewards
+    y+=96;const list=S.rewards.slice().sort((a,b)=>a.days-b.days).slice(0,3);
+    if(!list.length){g.fillStyle=muted;g.font=`400 34px ${FONT}`;g.fillText('还没设置奖励',80,y+40);}
+    list.forEach((r,i)=>{const pr=r.repeat?st.cur%r.days:Math.min(st.cur,r.days),won=r.repeat?(st.cur>0&&st.cur%r.days===0):!!S.unlocked[r.id];
+      rr(g,80,y,W-160,104,26);g.fillStyle=won?'#FDF0E2':'#FFFFFF';g.fill();g.lineWidth=2;g.strokeStyle=won?amber:line;g.stroke();
+      g.fillStyle=ink;g.font=`700 38px ${FONT}`;g.fillText(fit(g,showRewards?r.name:`奖励 ${i+1}`,560),114,y+50);
+      g.fillStyle=won?amber:muted;g.font=`800 32px ${NUM}`;g.textAlign='right';g.fillText(won?'已解锁 ✓':`${pr} / ${r.days}${r.repeat?' · 循环':''}`,W-114,y+52);g.textAlign='left';
+      rr(g,114,y+72,W-228,12,6);g.fillStyle=line;g.fill();const q=won?1:pr/r.days;if(q>0){rr(g,114,y+72,Math.max(12,(W-228)*q),12,6);const gr=g.createLinearGradient(114,0,W-114,0);gr.addColorStop(0,'#FFC56E');gr.addColorStop(1,amber);g.fillStyle=gr;g.fill()}
+      y+=122});
+    // footer with QR
+    const fy=H-228;g.fillStyle='#FFFFFF';rr(g,60,fy,W-120,196,30);g.fill();
+    const qc=document.createElement('canvas');if(isHttp&&drawQR(qc,APP_URL,170))g.drawImage(qc,86,fy+15,170,170);
+    const tx=isHttp?290:100;g.fillStyle=ink;g.font=`800 42px ${FONT}`;g.fillText(isHttp?'扫码，一起不刷了':'一起不刷了',tx,fy+80);
+    g.fillStyle=muted;g.font=`400 30px ${FONT}`;g.fillText('自己定奖励和惩罚 · 不用注册',tx,fy+128);
+    g.font=`400 24px ${FONT}`;g.fillText(fit(g,APP_URL.replace(/^https?:\/\//,''),W-tx-100),tx,fy+170);
+    return cv}
+  function openCard(){
+    let show=true,cv=drawCard(show);
+    const html=`<img class="cardimg" id="cardImg" alt="打卡分享图预览">
+      <label class="ck" style="font-size:14px"><input type="checkbox" id="cardRw" checked>图上显示奖励内容</label>
+      <div class="row"><button class="btn primary" type="button" id="cardShare">分享图片</button><button class="btn" type="button" id="cardSave">保存图片</button></div>
+      <p class="tiny" id="cardTip">也可以长按上面的图片保存，再发到微信群或朋友圈。</p>`;
+    openBS('打卡分享图',html,o=>{
+      const img=o.querySelector('#cardImg');const paint=()=>{img.src=cv.toDataURL('image/png')};paint();
+      o.querySelector('#cardRw').onchange=e=>{show=e.target.checked;cv=drawCard(show);paint()};
+      const fileOf=()=>new Promise(res=>cv.toBlob(b=>res(new File([b],'不刷了-'+ds(todayD())+'.png',{type:'image/png'})),'image/png'));
+      o.querySelector('#cardShare').onclick=async()=>{try{const f=await fileOf();
+          if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],text:shareText()+APP_URL});}
+          else{toast('这个浏览器不支持直接分享图片，请长按图片保存后再发')}}catch(e){}};
+      o.querySelector('#cardSave').onclick=()=>{try{const a=document.createElement('a');a.href=cv.toDataURL('image/png');a.download='不刷了-'+ds(todayD())+'.png';document.body.appendChild(a);a.click();a.remove();toast('图片已生成，如果没有自动保存，请长按图片保存')}catch(e){toast('请长按图片保存')}};})}
+  $('openCard').onclick=openCard;
+
+  // ---- "I want to scroll" helper ----
+  const IDEAS=['喝一杯水','做 15 个深蹲','起来走一圈','去洗把脸','给朋友发条消息','读两页书','把手机放到另一个房间','整理一下桌面','做 10 次深呼吸','写下此刻在想什么','听一首喜欢的歌','拉伸一下肩颈','出门晒 3 分钟太阳','洗几个杯子'];
+  function openUrge(){
+    const total=180;let left=total,tm=null,idx=Math.floor(Math.random()*IDEAS.length);const tk=ds(todayD());
+    const C=2*Math.PI*80;
+    const html=`<p class="tiny" style="text-align:left">想刷的冲动通常几分钟就会过去。先放下手机，做下面这件事，等计时走完。</p>
+      <div class="ring"><svg viewBox="0 0 180 180"><circle cx="90" cy="90" r="80" fill="none" stroke="var(--line)" stroke-width="10"/><circle id="urgeArc" cx="90" cy="90" r="80" fill="none" stroke="var(--heather)" stroke-width="10" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="0"/></svg><div class="t" id="urgeT">3:00</div></div>
+      <div class="idea"><small>现在去做</small><b id="urgeIdea">${esc(IDEAS[idx])}</b></div>
+      <div class="row"><button class="btn" type="button" id="urgeNext">换一个</button></div>
+      <div class="row"><button class="btn primary" type="button" id="urgeWin">我忍住了</button>${S.days[tk]===undefined?'<button class="btn warn" type="button" id="urgeLose">没忍住，记为刷了</button>':''}</div>`;
+    const close=openBS('我想刷了',html,(o,cl)=>{
+      const tEl=o.querySelector('#urgeT'),arc=o.querySelector('#urgeArc');
+      tm=setInterval(()=>{left=Math.max(0,left-1);tEl.textContent=`${Math.floor(left/60)}:${pad(left%60)}`;arc.setAttribute('stroke-dashoffset',String(C*(1-left/total)));
+        if(left===0){clearInterval(tm);tm=null;tEl.textContent='✓';o.querySelector('.idea small').textContent='3 分钟到了';o.querySelector('#urgeIdea').textContent='冲动是不是小了一点？';chime()}},1000);
+      o.querySelector('#urgeNext').onclick=()=>{idx=(idx+1+Math.floor(Math.random()*(IDEAS.length-1)))%IDEAS.length;o.querySelector('#urgeIdea').textContent=IDEAS[idx]};
+      o.querySelector('#urgeWin').onclick=()=>{S.urges[tk]=(S.urges[tk]||0)+1;save();cl();render();toast(`又赢了一次！今天已忍住 ${S.urges[tk]} 次`)};
+      const lose=o.querySelector('#urgeLose');if(lose)lose.onclick=()=>{cl();slip()};
+      return ()=>{if(tm)clearInterval(tm)}});
+    ensureAudio()}
+  $('openUrge').onclick=openUrge;
 
   load();showHint();render();
   if(!S.setup)openSettings();
