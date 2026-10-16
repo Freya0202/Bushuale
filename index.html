@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>戒刷打卡</title>
+<meta name="description" content="戒掉刷短视频：每天一键打卡，自己定周期、奖励和惩罚。数据只存在你自己的手机上。">
+<meta name="theme-color" content="#2F6B4F" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121614" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="戒刷打卡">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+/* Layout: one narrow phone column — streak hero + challenge bar, big check button, owed penalties, this week, reward ladder, 5-week grid; settings as a full-screen sheet */
+:root{
+  --bg:#F2F3EF; --surface:#FFFFFF; --ink:#1E2421; --muted:#68716B; --line:#DCE0DA;
+  --moss:#2F6B4F; --moss-soft:#DCEBE2; --heather:#7B4E8C; --heather-soft:#EEE4F2;
+  --slip:#B5483B; --slip-soft:#F6E1DD; --onaccent:#FFFFFF;
+  --f-num:"DIN Alternate","Avenir Next","Segoe UI",Roboto,"PingFang SC",system-ui,sans-serif;
+  --f-body:"PingFang SC","Hiragino Sans GB","Noto Sans SC","Microsoft YaHei",system-ui,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#121614; --surface:#1B201D; --ink:#E9EEEA; --muted:#97A29B; --line:#2C3430;
+  --moss:#6CC197; --moss-soft:#1F3329; --heather:#C59BD6; --heather-soft:#2E2433;
+  --slip:#E7887B; --slip-soft:#3A2220; --onaccent:#0E1411; color-scheme:dark }}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+.wrap{max-width:460px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:calc(40px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:22px}
+h1,h2,h3{margin:0}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.top h1{font-size:15px;font-weight:700;letter-spacing:.04em}
+.top .r{display:flex;align-items:center;gap:10px}
+.top .date{color:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.gear{appearance:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;width:36px;height:36px;display:grid;place-items:center;cursor:pointer;color:var(--muted)}
+.gear svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+.hero{display:flex;flex-direction:column;gap:12px}
+.hero .row1{display:flex;align-items:flex-end;gap:14px}
+.big{font-family:var(--f-num);font-weight:800;font-size:96px;line-height:.85;letter-spacing:-.04em;font-variant-numeric:tabular-nums;color:var(--moss)}
+.hero .lbl{padding-bottom:6px;min-width:0}
+.hero .lbl b{display:block;font-size:18px}
+.hero .lbl span{color:var(--muted);font-size:13px}
+.goal{display:flex;flex-direction:column;gap:5px}
+.goal .t{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.goal .track{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.goal .track i{display:block;height:100%;background:var(--moss);border-radius:99px;transition:width .5s}
+
+.check{appearance:none;border:0;width:100%;border-radius:22px;padding:22px 18px;font:inherit;font-size:20px;font-weight:900;letter-spacing:.06em;background:var(--moss);color:var(--onaccent);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .12s}
+.check small{font-size:13px;font-weight:500;letter-spacing:0;opacity:.85}
+.check:active{transform:scale(.98)}
+.check.done{background:var(--moss-soft);color:var(--moss)}
+.check.slipped{background:var(--slip-soft);color:var(--slip)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--heather);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.row.l{justify-content:flex-start}
+.btn{appearance:none;font:inherit;font-size:13px;background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:7px 14px;cursor:pointer}
+.btn.warn{color:var(--slip);border-color:var(--slip)}
+.btn.solid-warn{background:var(--slip);color:var(--onaccent);border-color:var(--slip)}
+.btn.primary{background:var(--moss);color:var(--onaccent);border-color:var(--moss);font-weight:700}
+.btn.on{background:var(--moss);color:var(--onaccent);border-color:var(--moss)}
+.btn.sm{padding:5px 11px;font-size:12px}
+
+.sec h2{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--muted);margin-bottom:10px}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.wd{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+.dot{width:100%;max-width:40px;aspect-ratio:1;border-radius:50%;border:2px dashed var(--line);display:grid;place-items:center;font-family:var(--f-num);font-weight:600;font-size:14px;color:var(--muted)}
+.dot.ok{background:var(--moss);border:2px solid var(--moss);color:var(--onaccent)}
+.dot.bad{background:var(--slip-soft);border:2px solid var(--slip);color:var(--slip)}
+.dot.today{border-style:solid;border-color:var(--ink);color:var(--ink)}
+.dot.ok.today{border-color:var(--moss);color:var(--onaccent)}
+
+/* owed penalties */
+.owed{display:flex;flex-direction:column;gap:8px}
+.debt{background:var(--slip-soft);border:1px solid var(--slip);border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:12px}
+.debt div{flex:1;min-width:0}
+.debt b{display:block;font-size:15px;overflow-wrap:anywhere}
+.debt span{font-size:12px;color:var(--muted)}
+.debt .btn{border-color:var(--slip);color:var(--slip);background:var(--surface);white-space:nowrap}
+
+.ladder{display:flex;flex-direction:column;gap:10px}
+.rung{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:4px 14px;align-items:center}
+.rung .ic{grid-row:span 2;width:44px;height:44px;border-radius:12px;background:var(--heather-soft);display:grid;place-items:center}
+.rung .ic svg{width:26px;height:26px;stroke:var(--heather);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.rung .name{font-weight:700;font-size:16px;min-width:0;overflow-wrap:anywhere}
+.rung .name em{font-style:normal;font-weight:500;color:var(--muted);font-size:13px;margin-left:6px;white-space:nowrap}
+.rung .count{font-family:var(--f-num);font-weight:600;font-variant-numeric:tabular-nums;font-size:14px;color:var(--muted);white-space:nowrap}
+.bar{grid-column:2/4;height:8px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--heather);border-radius:99px;transition:width .5s}
+.rung.won{border-color:var(--heather);background:var(--heather-soft)}
+.rung.won .ic{background:var(--heather)}
+.rung.won .ic svg{stroke:var(--onaccent)}
+.rung.won .count{color:var(--heather);font-weight:800}
+.rung .meta{grid-column:2/4;font-size:12px;color:var(--muted)}
+.empty{font-size:13px;color:var(--muted);background:var(--surface);border:1px dashed var(--line);border-radius:14px;padding:14px}
+
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.gh{font-size:11px;color:var(--muted);text-align:center}
+.cell{aspect-ratio:1;border-radius:6px;background:var(--line);opacity:.55}
+.cell.ok{background:var(--moss);opacity:1}
+.cell.bad{background:var(--slip);opacity:1}
+.cell.future{background:transparent;border:1px dashed var(--line);opacity:1}
+.cell.today{outline:2px solid var(--ink);outline-offset:1px}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:8px;flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px}
+.stat b{display:block;font-family:var(--f-num);font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
+.stat span{font-size:11px;color:var(--muted)}
+@media (max-width:360px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+.note{font-size:12px;color:var(--muted);text-align:center;margin:0}
+.hint{background:var(--surface);border:1px dashed var(--moss);border-radius:14px;padding:12px 14px;font-size:13px;display:flex;gap:10px;align-items:flex-start}
+.hint div{flex:1;min-width:0}
+.hint b{display:block;margin-bottom:2px}
+.hint .x{appearance:none;border:0;background:none;color:var(--muted);font-size:18px;line-height:1;cursor:pointer;padding:2px 4px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;max-width:calc(100% - 32px);text-align:center;z-index:40}
+.modal{position:fixed;inset:0;background:color-mix(in srgb,var(--bg) 88%,transparent);display:grid;place-items:center;padding:24px;z-index:30}
+.modal .card{background:var(--surface);border:2px solid var(--heather);border-radius:24px;padding:26px 22px;text-align:center;max-width:340px;width:100%;display:flex;flex-direction:column;gap:10px;align-items:center}
+.modal.pen .card{border-color:var(--slip)}
+.modal .card b{font-size:21px}
+.modal .card ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;width:100%}
+.modal .card li{background:var(--slip-soft);color:var(--ink);border-radius:10px;padding:8px 10px;font-weight:700;overflow-wrap:anywhere}
+.modal .card .ic svg{width:56px;height:56px;stroke:var(--heather);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.alarm{background:var(--heather);color:var(--onaccent);border-radius:18px;padding:14px 16px;display:flex;align-items:center;gap:12px}
+.alarm b{display:block;font-size:17px}
+.alarm span{font-size:13px;opacity:.9}
+.alarm div{flex:1;min-width:0}
+.alarm button{appearance:none;border:0;background:var(--onaccent);color:var(--heather);font:inherit;font-weight:700;border-radius:999px;padding:8px 14px;cursor:pointer;white-space:nowrap}
+.alarm.ring{animation:ring 1s ease-in-out 3}
+@keyframes ring{0%,100%{transform:none}20%{transform:rotate(-1.5deg)}40%{transform:rotate(1.5deg)}60%{transform:rotate(-1deg)}80%{transform:rotate(1deg)}}
+.remind{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.remind b{display:block;font-size:15px}
+.remind span{font-size:12px;color:var(--muted)}
+
+/* settings sheet */
+.sheet{position:fixed;inset:0;z-index:20;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.sheet .wrap{gap:20px}
+.sheet .intro{font-size:14px;color:var(--muted);margin:0}
+.grp{display:flex;flex-direction:column;gap:8px}
+.grp h3{font-size:16px}
+.grp p{margin:0;font-size:12px;color:var(--muted)}
+.lab{font-size:12px;font-weight:700;letter-spacing:.1em;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{appearance:none;font:inherit;font-size:13px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:5px 12px;cursor:pointer}
+.chip.sel{background:var(--moss);color:var(--onaccent);border-color:var(--moss)}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+.item .full{grid-column:1/3}
+.item .opts{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.item .del{appearance:none;border:0;background:none;color:var(--muted);font:inherit;font-size:13px;cursor:pointer;padding:4px 6px}
+.item .del:hover{color:var(--slip)}
+input[type=text],input[type=number],input[type=time],select,textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 10px;width:100%;min-width:0}
+select{width:auto}
+.num{width:84px!important}
+textarea{min-height:90px;font-size:13px;font-family:ui-monospace,Menlo,monospace}
+.unit{display:flex;align-items:center;gap:6px}
+.unit span{font-size:13px;color:var(--muted);white-space:nowrap}
+label.ck{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+label.ck input{width:18px;height:18px;accent-color:var(--moss)}
+.card2{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.card2 p{margin:0;font-size:13px;color:var(--muted)}
+.danger{color:var(--slip)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap" id="main">
+  <div class="top"><h1>戒刷短视频</h1><div class="r"><span class="date" id="today"></span>
+    <button class="gear" id="openSet" type="button" aria-label="设置"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></div></div>
+
+  <div class="hint" id="installHint" hidden><div><b>先装到主屏幕</b><span id="installTxt"></span></div><button class="x" type="button" id="hintX" aria-label="关闭">×</button></div>
+
+  <div class="hero">
+    <div class="row1"><div class="big" id="streak">0</div>
+      <div class="lbl"><b>天连续不刷</b><span id="next">打第一次卡，开始计数</span></div></div>
+    <div class="goal"><div class="t"><span id="goalLbl">挑战 365 天</span><span id="goalNum">0 / 365</span></div><div class="track"><i id="goalBar" style="width:0"></i></div></div>
+  </div>
+
+  <div class="alarm" id="alarm" role="alert" hidden><div><b id="alarmTitle">23:00 了，今天还没打卡</b><span>没刷短视频就点右边，刷了也如实记一下</span></div><button type="button" id="alarmBtn">去打卡</button></div>
+
+  <button class="check" id="checkBtn" type="button"><span id="checkTxt">今天没刷短视频 · 打卡</span><small id="checkSub">点一下就完成</small></button>
+  <div class="row" id="actions"></div>
+
+  <section class="sec" id="owedSec" hidden><h2>待完成的惩罚</h2><div class="owed" id="owed"></div></section>
+
+  <section class="sec"><h2>本周</h2><div class="week" id="week"></div></section>
+  <section class="sec"><h2>奖励</h2><div class="ladder" id="ladder"></div></section>
+  <section class="sec"><h2>最近 5 周</h2><div class="grid" id="grid"></div>
+    <div class="legend"><span><i style="background:var(--moss)"></i>没刷</span><span><i style="background:var(--slip)"></i>刷了</span><span><i style="background:var(--line)"></i>没打卡</span></div>
+  </section>
+
+  <div class="remind"><div><b id="remindTitle">每晚 23:00 提醒</b><span id="remindSub"></span></div><button type="button" class="btn" id="bellBtn">打开铃声</button></div>
+
+  <div class="stats">
+    <div class="stat"><b id="sBest">0</b><span>最长连续</span></div>
+    <div class="stat"><b id="sTotal">0</b><span>累计没刷</span></div>
+    <div class="stat"><b id="sSlip">0</b><span>破戒次数</span></div>
+    <div class="stat"><b id="sPen">0</b><span>惩罚已完成</span></div>
+  </div>
+
+  <p class="note" id="rules"></p>
+</div>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="wrap">
+    <div class="top"><h1 id="setTitle">设置</h1><button class="btn primary" type="button" id="saveSet">保存</button></div>
+    <p class="intro" id="setIntro" hidden>目标只有一个：戒掉刷短视频。下面的周期、奖励和惩罚按你自己的情况来定，以后随时可以在右上角齿轮里修改。</p>
+
+    <div class="grp">
+      <h3>挑战周期</h3>
+      <p>连续多少天不刷算挑战成功。科学研究里养成新习惯平均要两个月左右，可以先从短一点的开始。</p>
+      <div class="chips" id="periodChips"></div>
+      <div class="unit"><input type="number" class="num" id="periodDays" min="1" max="3650" inputmode="numeric" aria-label="挑战天数"><span>天</span></div>
+    </div>
+
+    <div class="grp">
+      <h3>奖励</h3>
+      <p>连续不刷满对应天数就解锁。勾选"循环"的奖励每满一次都能领，比如每连续 7 天奖励一次。</p>
+      <div id="rwList" style="display:flex;flex-direction:column;gap:8px"></div>
+      <div class="row l"><button class="btn" type="button" id="addRw">＋ 添加奖励</button></div>
+    </div>
+
+    <div class="grp">
+      <h3>惩罚</h3>
+      <p>"刷了"是你主动记下的破戒；"漏打卡"是某天既没打卡也没补卡（第二天还可以补，过了才算漏）。触发后会出现在首页的待办里，做完点"完成"。</p>
+      <div id="penList" style="display:flex;flex-direction:column;gap:8px"></div>
+      <div class="row l"><button class="btn" type="button" id="addPen">＋ 添加惩罚</button></div>
+      <span class="lab">常用惩罚，点一下添加</span>
+      <div class="chips" id="penChips"></div>
+    </div>
+
+    <div class="grp">
+      <h3>每晚提醒</h3>
+      <div class="unit"><input type="time" id="remindTime" value="23:00" aria-label="提醒时间" style="width:140px"></div>
+    </div>
+
+    <div class="card2" id="backupCard">
+      <span class="lab">备份与换手机</span>
+      <p>数据只在这台手机上。换手机、清理浏览器数据或删掉主屏幕图标前，先导出备份；到新手机上打开 App 再导入。</p>
+      <div class="row l"><button class="btn" type="button" id="expFile">下载备份文件</button><button class="btn" type="button" id="expCopy">复制备份文字</button></div>
+      <div class="row l"><button class="btn" type="button" id="impFileBtn">从备份文件恢复</button><input type="file" id="impFile" accept=".json,application/json,text/plain" hidden></div>
+      <label for="impText" class="lab">或粘贴备份文字</label>
+      <textarea id="impText" placeholder="把复制的备份文字粘贴在这里"></textarea>
+      <div class="row l"><button class="btn" type="button" id="impTextBtn">用粘贴的文字恢复</button></div>
+    </div>
+
+    <div class="card2" id="resetCard">
+      <span class="lab danger">重新开始</span>
+      <p>清空这台手机上的全部打卡记录、已解锁的奖励和惩罚记录。周期、奖励、惩罚的设置保留。</p>
+      <div class="row l"><button class="btn warn" type="button" id="resetBtn">清空记录</button></div>
+    </div>
+
+    <div class="row"><button class="btn" type="button" id="closeSet">返回</button></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  const ICONS=[
+    '<svg viewBox="0 0 24 24"><path d="M20 12v9H4v-9"/><path d="M2 7h20v5H2z"/><path d="M12 21V7"/><path d="M12 7H7.5a2.5 2.5 0 1 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 1 0 0-5C13 2 12 7 12 7z"/></svg>',
+    '<svg viewBox="0 0 24 24"><path d="M12 2l3 6.3 6.9.9-5 4.8 1.2 6.9L12 17.6 5.9 20.9l1.2-6.9-5-4.8 6.9-.9z"/></svg>',
+    '<svg viewBox="0 0 24 24"><path d="M2 19l6-9 4 5 3-4 7 8z"/><path d="M12 4v4M10 6h4"/></svg>'
+  ];
+  const TROPHY='<svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"/></svg>';
+  const PERIODS=[21,30,66,100,365];
+  const PEN_PRESETS=['做 50 个深蹲','跑步 3 公里','存 50 元进奖励基金','给朋友发 20 元红包','做一次全屋家务','当晚 22:30 前上床','一周不点外卖奶茶','读 30 页书'];
+  const WD=['日','一','二','三','四','五','六'];
+  const KEY='jieshua-v1';
+  const uid=()=>Math.random().toString(36).slice(2,9);
+  const DEFAULT_REWARDS=()=>[
+    {id:uid(),name:'给自己买个小礼物',days:7,repeat:true},
+    {id:uid(),name:'一件想要很久的东西',days:30,repeat:false},
+    {id:uid(),name:'一次旅行',days:365,repeat:false}];
+  const DEFAULT_PENS=()=>[{id:uid(),name:'做 50 个深蹲',trigger:'slip'},{id:uid(),name:'存 20 元进奖励基金',trigger:'miss'}];
+  const blank=()=>({v:2,setup:false,period:365,rewards:DEFAULT_REWARDS(),penalties:DEFAULT_PENS(),days:{},unlocked:{},owed:[],missIssued:{},remind:'23:00',bell:true,hintClosed:false});
+  let S=blank(),armedSlip=false,armedReset=false,draft=null;
+
+  const $=id=>document.getElementById(id);
+  const pad=n=>String(n).padStart(2,'0');
+  const ds=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+  const pd=k=>new Date(k+'T12:00:00');
+  const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+  const todayD=()=>{const d=new Date();d.setHours(12,0,0,0);return d};
+  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const span=n=>n===7?'一周':n===30?'一个月':n===365?'一年':n+' 天';
+  const fmt=k=>{const p=String(k).split('-');return `${+p[1]}月${+p[2]}日`};
+  const clampDays=v=>Math.min(3650,Math.max(1,parseInt(v)||1));
+
+  function normalize(o){
+    if(!o||typeof o!=='object'||!o.days)return null;
+    const b=blank(),r={...b};
+    r.days={};Object.keys(o.days).forEach(k=>{if(/^\d{4}-\d{2}-\d{2}$/.test(k)&&(o.days[k]===0||o.days[k]===1))r.days[k]=o.days[k]});
+    r.period=clampDays(o.period||365);
+    r.remind=/^\d{2}:\d{2}$/.test(o.remind)?o.remind:'23:00';
+    r.bell=o.bell!==false;r.hintClosed=!!o.hintClosed;
+    r.rewards=Array.isArray(o.rewards)?o.rewards.filter(x=>x&&x.name).map(x=>({id:x.id||uid(),name:String(x.name).slice(0,40),days:clampDays(x.days),repeat:!!x.repeat})):b.rewards;
+    r.penalties=Array.isArray(o.penalties)?o.penalties.filter(x=>x&&x.name).map(x=>({id:x.id||uid(),name:String(x.name).slice(0,40),trigger:x.trigger==='miss'?'miss':'slip'})):[];
+    r.unlocked={};
+    if(o.unlocked&&typeof o.unlocked==='object'){
+      Object.keys(o.unlocked).forEach(k=>{const u=o.unlocked[k];
+        const m=/^r(\d)$/.exec(k);
+        if(m&&r.rewards[+m[1]]){r.unlocked[r.rewards[+m[1]].id]={date:u.date||u,name:u.name||r.rewards[+m[1]].name,rid:r.rewards[+m[1]].id}}  // v1 index keys
+        else if(['week','month','year'].includes(k)){const i=['week','month','year'].indexOf(k);if(r.rewards[i])r.unlocked[r.rewards[i].id]={date:u,name:r.rewards[i].name,rid:r.rewards[i].id}}
+        else if(u&&u.date)r.unlocked[k]={date:u.date,name:String(u.name||''),rid:u.rid||k}})}
+    r.owed=Array.isArray(o.owed)?o.owed.filter(x=>x&&x.name&&x.date).map(x=>({id:x.id||uid(),name:String(x.name),date:x.date,trigger:x.trigger==='miss'?'miss':'slip',done:x.done||null})):[];
+    r.missIssued=(o.missIssued&&typeof o.missIssued==='object')?{...o.missIssued}:{};
+    // older data (v1) already had rules set by the person; skip first-run setup
+    r.setup=o.v===2?!!o.setup:true;
+    return r}
+  function load(){try{const raw=localStorage.getItem(KEY);if(raw){const n=normalize(JSON.parse(raw));if(n)S=n}}catch(e){}}
+  function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('保存失败：浏览器不允许存储数据')}}
+  try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+
+  function streakInfo(){
+    const t=todayD(),tk=ds(t);let cur=0,d=S.days[tk]===1?t:addDays(t,-1),startK=null;
+    if(S.days[tk]!==0){while(S.days[ds(d)]===1){cur++;startK=ds(d);d=addDays(d,-1)}}
+    const keys=Object.keys(S.days).sort();let best=0,run=0,prev=null,total=0,slips=0;
+    keys.forEach(k=>{const v=S.days[k];if(v===1){total++;const cont=prev&&S.days[prev]===1&&ds(addDays(pd(prev),1))===k;run=cont?run+1:1;best=Math.max(best,run)}else{slips++;run=0}prev=k});
+    return {cur,startK,best:Math.max(best,cur),total,slips};
+  }
+
+  // missed days: a day counts as missed once the make-up window (the next day) has passed
+  function issueMissed(){
+    const keys=Object.keys(S.days).sort();if(!keys.length)return false;
+    const t=todayD();let d=pd(keys[0]),changed=false,issued=[];
+    const lastClosed=addDays(t,-2);
+    while(d<=lastClosed){const k=ds(d);
+      if(S.days[k]===undefined&&!S.missIssued[k]){S.missIssued[k]=1;changed=true;
+        S.penalties.filter(p=>p.trigger==='miss').forEach(p=>{S.owed.push({id:uid(),name:p.name,date:k,trigger:'miss',done:null});issued.push(p.name)})}
+      d=addDays(d,1)}
+    if(issued.length)setTimeout(()=>penaltyModal('有一天漏打卡了',issued),300);
+    return changed}
+
+  function unlockCheck(st){const tk=ds(todayD());let changed=false;const pops=[];
+    S.rewards.forEach(r=>{
+      if(r.repeat){if(!st.startK)return;const times=Math.floor(st.cur/r.days);
+        for(let k=1;k<=times;k++){const key=r.id+'@'+st.startK+'#'+k;if(!S.unlocked[key]){S.unlocked[key]={date:tk,name:r.name,rid:r.id};changed=true;if(k===times)pops.push({r,txt:`连续 ${r.days*k} 天没刷短视频`})}}}
+      else if(st.cur>=r.days&&!S.unlocked[r.id]){S.unlocked[r.id]={date:tk,name:r.name,rid:r.id};changed=true;pops.push({r,txt:`连续 ${r.days} 天没刷短视频`})}});
+    const ck='challenge@'+S.period;
+    if(st.cur>=S.period&&!S.unlocked[ck]){S.unlocked[ck]={date:tk,name:'挑战完成',rid:'challenge'};changed=true;pops.push({r:{name:`${S.period} 天挑战完成`},txt:'你已经戒掉刷短视频的习惯了。',trophy:true})}
+    if(changed)save();
+    pops.forEach((p,i)=>setTimeout(()=>celebrate(p),i*50))}
+
+  function render(){
+    const t=todayD(),tk=ds(t),yk=ds(addDays(t,-1));
+    $('today').textContent=`${t.getMonth()+1}月${t.getDate()}日 周${WD[t.getDay()]}`;
+    if(issueMissed())save();
+    const st=streakInfo();
+    $('streak').textContent=st.cur;
+    unlockCheck(st);
+    const order=S.rewards.slice().sort((a,b)=>a.days-b.days);
+    const nexts=order.map(r=>({r,need:r.repeat?r.days-(st.cur%r.days):r.days-st.cur})).filter(x=>x.need>0&&(x.r.repeat||!S.unlocked[x.r.id])).sort((a,b)=>a.need-b.need);
+    $('next').textContent=!Object.keys(S.days).length?'打第一次卡，开始计数':st.cur>=S.period?'挑战完成，继续保持':nexts.length?`再坚持 ${nexts[0].need} 天 → ${nexts[0].r.name}`:`离挑战完成还有 ${S.period-st.cur} 天`;
+    $('goalLbl').textContent=`挑战周期 ${S.period} 天`;$('goalNum').textContent=`${Math.min(st.cur,S.period)} / ${S.period}`;
+    $('goalBar').style.width=(Math.min(1,st.cur/S.period)*100).toFixed(1)+'%';
+
+    const btn=$('checkBtn'),tv=S.days[tk];
+    btn.className='check'+(tv===1?' done':tv===0?' slipped':'');
+    $('checkTxt').textContent=tv===1?'✓ 今天已打卡':tv===0?'今天记为"刷了"':'今天没刷短视频 · 打卡';
+    $('checkSub').textContent=tv===1?'明天继续，保持住':tv===0?'明天重新开始，从 1 算起':'点一下就完成';
+    btn.disabled=tv!==undefined;
+
+    const act=$('actions');act.innerHTML='';
+    const mk=(txt,cls,fn)=>{const b=document.createElement('button');b.type='button';b.className='btn '+cls;b.textContent=txt;b.onclick=fn;act.appendChild(b)};
+    if(S.days[yk]===undefined&&Object.keys(S.days).length&&pd(Object.keys(S.days).sort()[0])<=addDays(t,-1))mk('补打昨天的卡','',()=>{S.days[yk]=1;afterChange('昨天已补上')});
+    if(tv===undefined){
+      mk(armedSlip?'确认：今天刷了':'今天刷了…',armedSlip?'solid-warn':'warn',()=>{if(!armedSlip){armedSlip=true;render();setTimeout(()=>{armedSlip=false;render()},4000)}else{armedSlip=false;slip()}});
+    }else mk('撤销今天的记录','',()=>{delete S.days[tk];S.owed=S.owed.filter(o=>!(o.date===tk&&o.trigger==='slip'&&!o.done));afterChange('已撤销')});
+
+    // owed penalties
+    const ow=S.owed.filter(o=>!o.done).sort((a,b)=>a.date<b.date?-1:1);
+    $('owedSec').hidden=!ow.length;const ol=$('owed');ol.innerHTML='';
+    ow.forEach(o=>{const el=document.createElement('div');el.className='debt';
+      el.innerHTML=`<div><b>${esc(o.name)}</b><span>${fmt(o.date)} · ${o.trigger==='slip'?'刷了短视频':'漏打卡'}</span></div><button class="btn sm" type="button">完成</button>`;
+      el.querySelector('button').onclick=()=>{o.done=tk;afterChange('惩罚已完成，翻篇了')};ol.appendChild(el)});
+
+    const wk=$('week');wk.innerHTML='';const mon=addDays(t,-((t.getDay()+6)%7));
+    for(let i=0;i<7;i++){const d=addDays(mon,i),k=ds(d),v=S.days[k];const el=document.createElement('div');el.className='wd';
+      el.innerHTML=`<span>${WD[d.getDay()]}</span><div class="dot${v===1?' ok':v===0?' bad':''}${k===tk?' today':''}">${v===1?'✓':v===0?'✕':d.getDate()}</div>`;wk.appendChild(el)}
+
+    const ld=$('ladder');ld.innerHTML='';
+    if(!order.length){ld.innerHTML='<div class="empty">还没有设置奖励。点右上角齿轮添加一个，坚持起来更有劲。</div>'}
+    order.forEach((r,idx)=>{const el=document.createElement('div');const ic=ICONS[Math.min(2,Math.floor(idx*3/Math.max(1,order.length)))];
+      if(r.repeat){const earned=Object.values(S.unlocked).filter(u=>u.rid===r.id).length;const prog=st.cur%r.days;const fresh=st.cur>0&&prog===0;
+        el.className='rung'+(fresh?' won':'');
+        el.innerHTML=`<div class="ic">${ic}</div><div class="name">${esc(r.name)}<em>每 ${r.days} 天</em></div><div class="count">${fresh?'刚解锁':prog+' / '+r.days}</div>`+
+          (fresh?`<div class="meta">已领 ${earned} 次 · 去兑现吧</div>`:`<div class="bar"><i style="width:${(prog/r.days*100).toFixed(1)}%"></i></div><div class="meta">已领 ${earned} 次</div>`);
+      }else{const u=S.unlocked[r.id];const won=!!u;const p=Math.min(1,st.cur/r.days);
+        el.className='rung'+(won?' won':'');
+        el.innerHTML=`<div class="ic">${ic}</div><div class="name">${esc(r.name)}<em>${span(r.days)}</em></div><div class="count">${won?'已解锁':Math.min(st.cur,r.days)+' / '+r.days}</div>`+
+          (won?`<div class="meta">${fmt(u.date)} 达成 · 去兑现吧</div>`:`<div class="bar"><i style="width:${(p*100).toFixed(1)}%"></i></div>`)}
+      ld.appendChild(el)});
+
+    const g=$('grid');g.innerHTML='';
+    WD.slice(1).concat(WD[0]).forEach(w=>{const h=document.createElement('div');h.className='gh';h.textContent=w;g.appendChild(h)});
+    const start=addDays(mon,-28);
+    for(let i=0;i<35;i++){const d=addDays(start,i),k=ds(d),v=S.days[k];const c=document.createElement('div');
+      c.className='cell'+(d>t&&k!==tk?' future':v===1?' ok':v===0?' bad':'')+(k===tk?' today':'');c.title=k;g.appendChild(c)}
+
+    $('sBest').textContent=st.best;$('sTotal').textContent=st.total;$('sSlip').textContent=st.slips;
+    const pdone=S.owed.filter(o=>o.done).length;$('sPen').textContent=S.owed.length?pdone+'/'+S.owed.length:'0';
+    $('remindTitle').textContent=`每晚 ${S.remind} 提醒`;$('alarmTitle').textContent=`${S.remind} 了，今天还没打卡`;
+    const hasSlipPen=S.penalties.some(p=>p.trigger==='slip'),hasMissPen=S.penalties.some(p=>p.trigger==='miss');
+    $('rules').innerHTML='规则：每天打卡一次；漏打或"刷了"都会让连续天数归零。忘了打卡，第二天可以补昨天。'+
+      (hasSlipPen||hasMissPen?'<br>'+[hasSlipPen?'"刷了"':'',hasMissPen?'漏打卡':''].filter(Boolean).join('和')+'会触发惩罚。':'')+
+      '<br>记录只保存在这台手机上，不需要账号。记得定期在设置里备份。';
+    paintBell();checkAlarm();
+  }
+
+  function slip(){const tk=ds(todayD());S.days[tk]=0;const pens=S.penalties.filter(p=>p.trigger==='slip');
+    pens.forEach(p=>S.owed.push({id:uid(),name:p.name,date:tk,trigger:'slip',done:null}));
+    save();render();
+    if(pens.length)penaltyModal('今天刷了，接受惩罚',pens.map(p=>p.name));else toast('记下了，明天重新开始')}
+
+  function afterChange(msg){save();render();if(msg)toast(msg)}
+  let tt;function toast(m){let el=document.querySelector('.toast');if(!el){el=document.createElement('div');el.className='toast';el.setAttribute('role','status');document.body.appendChild(el)}el.textContent=m;el.hidden=false;clearTimeout(tt);tt=setTimeout(()=>el.hidden=true,2400)}
+  // pop-ups show one at a time
+  const mq=[];let mOpen=false;
+  function showModal(cls,html,onShow){mq.push({cls,html,onShow});if(!mOpen)nextModal()}
+  function nextModal(){const m=mq.shift();if(!m){mOpen=false;return}mOpen=true;
+    const o=document.createElement('div');o.className='modal '+m.cls;o.innerHTML=m.html;
+    o.querySelector('button').onclick=()=>{o.remove();nextModal()};document.body.appendChild(o);o.querySelector('button').focus();if(m.onShow)m.onShow()}
+  function celebrate(p){showModal('',`<div class="card"><div class="ic">${p.trophy?TROPHY:ICONS[1]}</div><b>解锁：${esc(p.r.name)}</b><span>${esc(p.txt)}${p.trophy?'':'，这是你挣来的。'}</span><button class="btn primary" type="button">收下</button></div>`,chime)}
+  function penaltyModal(title,list){showModal('pen',`<div class="card"><b>${esc(title)}</b><span>按你自己定的规则，要完成：</span><ul>${list.map(n=>`<li>${esc(n)}</li>`).join('')}</ul><span style="font-size:13px;color:var(--muted)">做完后在首页"待完成的惩罚"里点"完成"。连续天数从下一次打卡重新算。</span><button class="btn primary" type="button">我接受</button></div>`)}
+
+  $('checkBtn').onclick=()=>{const tk=ds(todayD());if(S.days[tk]!==undefined)return;S.days[tk]=1;afterChange(null);toast('打卡成功 ✓')};
+
+  // ---- nightly reminder (works while the app is open) ----
+  let actx=null,rungFor=null;
+  function ensureAudio(){try{if(!actx)actx=new (window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume()}catch(e){}}
+  function chime(){if(!actx||!S.bell)return;try{const t0=actx.currentTime;[0,.35,.7,1.4,1.75,2.1].forEach((dt,i)=>{const o=actx.createOscillator(),g=actx.createGain();o.type='sine';o.frequency.value=[880,1175,1568][i%3];g.gain.setValueAtTime(.0001,t0+dt);g.gain.exponentialRampToValueAtTime(.35,t0+dt+.02);g.gain.exponentialRampToValueAtTime(.0001,t0+dt+.32);o.connect(g).connect(actx.destination);o.start(t0+dt);o.stop(t0+dt+.34)})}catch(e){}}
+  function remindMin(){const [h,m]=S.remind.split(':').map(Number);return h*60+m}
+  function checkAlarm(){const now=new Date(),tk=ds(todayD()),el=$('alarm');
+    const due=S.setup&&now.getHours()*60+now.getMinutes()>=remindMin()&&S.days[tk]===undefined;
+    el.hidden=!due;
+    if(due&&rungFor!==tk){rungFor=tk;el.classList.remove('ring');void el.offsetWidth;el.classList.add('ring');chime();try{navigator.vibrate&&navigator.vibrate([300,150,300])}catch(e){}}}
+  function paintBell(){const on=S.bell&&actx&&actx.state==='running';const b=$('bellBtn');b.textContent=on?'铃声已开':S.bell?'打开铃声':'铃声已关';b.classList.toggle('on',!!on);
+    $('remindSub').textContent=on?'App 开着时，到点会响铃并弹出提醒':S.bell?'点一下"打开铃声"，到点才能响':'到点只弹出提醒，不响铃'}
+  $('bellBtn').onclick=()=>{if(S.bell&&actx&&actx.state==='running'){S.bell=false;save();paintBell();toast('铃声已关');return}
+    S.bell=true;save();ensureAudio();chime();setTimeout(paintBell,100);toast('铃声已开，这就是提醒音')};
+  document.addEventListener('pointerdown',()=>{if(S.bell){ensureAudio();setTimeout(paintBell,100)}},{once:true});
+  $('alarmBtn').onclick=()=>$('checkBtn').click();
+  setInterval(checkAlarm,20000);
+
+  // ---- install hint ----
+  const standalone=window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+  function showHint(){if(!standalone&&!S.hintClosed){const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+    $('installTxt').textContent=ios?'用 Safari 打开，点底部的分享按钮 → "添加到主屏幕"。装好后从图标打开，数据更不容易丢。':'点浏览器右上角菜单 → "添加到主屏幕"或"安装应用"。装好后从图标打开，数据更不容易丢。';
+    $('installHint').hidden=false}}
+  $('hintX').onclick=()=>{S.hintClosed=true;save();$('installHint').hidden=true};
+
+  // ---- settings ----
+  function drawPeriod(){const c=$('periodChips');c.innerHTML='';
+    PERIODS.forEach(n=>{const b=document.createElement('button');b.type='button';b.className='chip'+(draft.period===n?' sel':'');b.textContent=n===365?'365 天（一年）':n+' 天';
+      b.onclick=()=>{draft.period=n;$('periodDays').value=n;drawPeriod()};c.appendChild(b)});
+    $('periodDays').value=draft.period}
+  $('periodDays').oninput=e=>{draft.period=clampDays(e.target.value);const c=$('periodChips');[...c.children].forEach((b,i)=>b.classList.toggle('sel',PERIODS[i]===draft.period))};
+  function drawRewards(){const l=$('rwList');l.innerHTML='';
+    if(!draft.rewards.length)l.innerHTML='<div class="empty">还没有奖励，点下面添加。</div>';
+    draft.rewards.forEach((r,i)=>{const d=document.createElement('div');d.className='item';
+      d.innerHTML=`<input type="text" id="rwName_${r.id}" maxlength="40" placeholder="奖励内容，比如：一双新鞋" aria-label="奖励 ${i+1}" value="${esc(r.name)}"><button class="del" type="button">删除</button>
+        <div class="opts full"><span>连续</span><input type="number" class="num" id="rwDays_${r.id}" min="1" max="3650" inputmode="numeric" aria-label="奖励 ${i+1} 天数" value="${r.days}"><span>天</span>
+        <label class="ck"><input type="checkbox" id="rwRep_${r.id}" ${r.repeat?'checked':''}>循环（每满一次都奖励）</label></div>`;
+      d.querySelector(`#rwName_${r.id}`).oninput=e=>r.name=e.target.value;
+      d.querySelector(`#rwDays_${r.id}`).oninput=e=>r.days=e.target.value;
+      d.querySelector(`#rwRep_${r.id}`).onchange=e=>r.repeat=e.target.checked;
+      d.querySelector('.del').onclick=()=>{draft.rewards.splice(i,1);drawRewards()};l.appendChild(d)})}
+  function drawPens(){const l=$('penList');l.innerHTML='';
+    if(!draft.penalties.length)l.innerHTML='<div class="empty">没有惩罚。只靠奖励也可以；想更严格就添加一条。</div>';
+    draft.penalties.forEach((p,i)=>{const d=document.createElement('div');d.className='item';
+      d.innerHTML=`<input type="text" id="penName_${p.id}" maxlength="40" placeholder="惩罚内容，比如：做 50 个深蹲" aria-label="惩罚 ${i+1}" value="${esc(p.name)}"><button class="del" type="button">删除</button>
+        <div class="opts full"><span>什么时候触发</span><select id="penTrig_${p.id}" aria-label="惩罚 ${i+1} 触发条件"><option value="slip" ${p.trigger==='slip'?'selected':''}>刷了短视频</option><option value="miss" ${p.trigger==='miss'?'selected':''}>漏打卡</option></select></div>`;
+      d.querySelector(`#penName_${p.id}`).oninput=e=>p.name=e.target.value;
+      d.querySelector(`#penTrig_${p.id}`).onchange=e=>p.trigger=e.target.value;
+      d.querySelector('.del').onclick=()=>{draft.penalties.splice(i,1);drawPens()};l.appendChild(d)})}
+  function drawPenChips(){const c=$('penChips');c.innerHTML='';
+    PEN_PRESETS.forEach(n=>{const b=document.createElement('button');b.type='button';b.className='chip';b.textContent='＋ '+n;
+      b.onclick=()=>{draft.penalties.push({id:uid(),name:n,trigger:'slip'});drawPens();toast('已添加，可以改触发条件')};c.appendChild(b)})}
+  $('addRw').onclick=()=>{draft.rewards.push({id:uid(),name:'',days:7,repeat:false});drawRewards();const ins=$('rwList').querySelectorAll('input[type=text]');ins[ins.length-1].focus()};
+  $('addPen').onclick=()=>{draft.penalties.push({id:uid(),name:'',trigger:'slip'});drawPens();const ins=$('penList').querySelectorAll('input[type=text]');ins[ins.length-1].focus()};
+
+  function openSettings(){
+    draft={period:S.period,rewards:S.rewards.map(r=>({...r})),penalties:S.penalties.map(p=>({...p}))};
+    const first=!S.setup;
+    $('setTitle').textContent=first?'定一个你自己的戒断计划':'设置';$('saveSet').textContent=first?'开始挑战':'保存';
+    $('setIntro').hidden=!first;$('backupCard').hidden=first;$('resetCard').hidden=first;$('closeSet').hidden=first;
+    drawPeriod();drawRewards();drawPens();drawPenChips();
+    $('remindTime').value=S.remind;$('impText').value='';armedReset=false;$('resetBtn').textContent='清空记录';$('resetBtn').className='btn warn';
+    $('sheet').hidden=false;$('main').hidden=true;window.scrollTo(0,0);$('sheet').scrollTop=0}
+  function closeSettings(){$('sheet').hidden=true;$('main').hidden=false;render()}
+  $('openSet').onclick=openSettings;$('closeSet').onclick=closeSettings;
+  $('saveSet').onclick=()=>{
+    const p=parseInt($('periodDays').value);if(!(p>=1&&p<=3650)){toast('挑战周期要在 1 到 3650 天之间');return}
+    for(const [i,r] of draft.rewards.entries()){r.name=String(r.name).trim();const d=parseInt(r.days);
+      if(!r.name){toast(`第 ${i+1} 个奖励还没写内容`);return}if(!(d>=1&&d<=3650)){toast(`第 ${i+1} 个奖励的天数要在 1 到 3650 之间`);return}r.days=d}
+    for(const [i,q] of draft.penalties.entries()){q.name=String(q.name).trim();if(!q.name){toast(`第 ${i+1} 个惩罚还没写内容`);return}}
+    const first=!S.setup;
+    S.period=p;S.rewards=draft.rewards;S.penalties=draft.penalties;
+    const tm=$('remindTime').value;if(/^\d{2}:\d{2}$/.test(tm))S.remind=tm;
+    S.setup=true;rungFor=null;save();closeSettings();toast(first?'计划定好了，今天就开始':'设置已保存')};
+
+  function backupText(){return JSON.stringify({app:'jieshua',exported:new Date().toISOString(),...S})}
+  $('expFile').onclick=()=>{try{const blob=new Blob([backupText()],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='戒刷打卡备份-'+ds(todayD())+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);toast('备份文件已生成')}catch(e){toast('下载失败，请改用"复制备份文字"')}};
+  $('expCopy').onclick=()=>{const t=backupText();const fallback=()=>{const ta=$('impText');ta.value=t;ta.focus();ta.select();toast('已选中备份文字，请手动复制')};
+    try{navigator.clipboard.writeText(t).then(()=>toast('备份文字已复制，存到备忘录或发给自己'),fallback)}catch(e){fallback()}};
+  function restore(raw){let o;try{o=JSON.parse(raw)}catch(e){toast('备份内容无法识别，请检查是否完整');return}
+    const n=normalize(o);if(!n){toast('这不是戒刷打卡的备份');return}
+    n.hintClosed=S.hintClosed;n.setup=true;S=n;save();closeSettings();toast(`已恢复 ${Object.keys(S.days).length} 天的记录`)}
+  $('impFileBtn').onclick=()=>$('impFile').click();
+  $('impFile').onchange=e=>{const f=e.target.files&&e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>restore(r.result);r.readAsText(f);e.target.value=''};
+  $('impTextBtn').onclick=()=>{const v=$('impText').value.trim();if(!v){toast('先把备份文字粘贴进来');return}restore(v)};
+  $('resetBtn').onclick=()=>{if(!armedReset){armedReset=true;$('resetBtn').textContent='再点一次确认清空';$('resetBtn').className='btn solid-warn';setTimeout(()=>{armedReset=false;$('resetBtn').textContent='清空记录';$('resetBtn').className='btn warn'},4000);return}
+    S.days={};S.unlocked={};S.owed=[];S.missIssued={};save();closeSettings();toast('记录已清空，从今天重新开始')};
+
+  load();showHint();render();
+  if(!S.setup)openSettings();
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&$('sheet').hidden)render()});
+  if('serviceWorker' in navigator&&location.protocol==='https:'){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+})();
+</script>
+</body>
+</html>
